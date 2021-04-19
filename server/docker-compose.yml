@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  server:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      DATABASE: database
+  database:
+    image: "neo4j:4.2.1"
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: "neo4j/password"
+    volumes:
+    - ./database/data:/var/lib/neo4j/data
+    - ./database/logs:/logs
+    - ./database/import:/var/lib/neo4j/import
+    - ./database/plugins:/var/lib/neo4j/plugins
