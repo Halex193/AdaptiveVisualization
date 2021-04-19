@@ -43,11 +43,12 @@ fun Application.configureRouting(driver: Driver)
         @Serializable
         data class Dataset(val name: String, val color: Int, val properties: List<String>, val username: String, val items: Int)
 
-        val result = driver.session().run("MATCH (d:Dataset), (d)-[:CONTAINS]->(i:Item) RETURN d, COUNT(i) AS items ORDER BY d.name")
+        val result = driver.session().run("MATCH (u:User)-[:CREATED]->(d:Dataset)-[:CONTAINS]->(i:Item) RETURN d, u.username AS username, COUNT(i) AS items ORDER BY d.name")
         val value = result.list()?.map { record ->
             val node = record.get(0)?.asNode() ?: error("Data missing")
-            val items = record.get(1)?.asInt() ?: error("Data missing")
-            Dataset(node["name"].asString(), node["color"].asInt(), node["properties"].asList { it.asString() }, node["username"].asString(), items)
+            val username = record.get(1)?.asString() ?: error("Data missing")
+            val items = record.get(2)?.asInt() ?: error("Data missing")
+            Dataset(node["name"].asString(), node["color"].asInt(), node["properties"].asList { it.asString() }, username, items)
         }
         return Json.encodeToString(value)
     }
@@ -91,9 +92,15 @@ fun Application.configureRouting(driver: Driver)
                             "properties" to mapOf(
                                 "name" to dataset.name,
                                 "color" to dataset.color,
-                                "properties" to dataset.properties,
-                                "username" to username
+                                "properties" to dataset.properties
                             )
+                        )
+                    )
+                    transaction.run(
+                        "MATCH (u:User), (d:Dataset) WHERE u.username=\$username AND d.name=\$name CREATE (u)-[:CREATED]->(d)",
+                        mapOf(
+                            "username" to username,
+                            "name" to dataset.name
                         )
                     )
                     transaction.run("MATCH (d) WHERE d.name = \$name UNWIND \$values AS map CREATE (d)-[:CONTAINS]->(i:Item) SET i = map",
@@ -123,7 +130,7 @@ fun Application.configureRouting(driver: Driver)
 
                 val status = driver.session().writeTransaction { transaction ->
                     val result = transaction.run(
-                        "MATCH (d:Dataset) WHERE d.name=\$name RETURN d.username AS username, d.properties AS properties",
+                        "MATCH (u:User)-[:CREATED]->(d:Dataset) WHERE d.name=\$name RETURN u.username AS username, d.properties AS properties",
                         mapOf("name" to datasetName)
                     )
                     val existingDataset = result.list().firstOrNull() ?: return@writeTransaction HttpStatusCode.NotFound
@@ -155,7 +162,7 @@ fun Application.configureRouting(driver: Driver)
 
                 val status = driver.session().writeTransaction { transaction ->
                     val result = transaction.run(
-                        "MATCH (d:Dataset) WHERE d.name=\$name RETURN d.username AS username",
+                        "MATCH (u:User)-[:CREATED]->(d:Dataset) WHERE d.name=\$name RETURN u.username AS username",
                         mapOf("name" to datasetName)
                     )
                     val existingDataset = result.list().firstOrNull() ?: return@writeTransaction HttpStatusCode.NotFound

@@ -66,7 +66,7 @@ suspend fun addDataset(
         val values: List<List<String>>
     )
 
-    val rows: List<List<String>> = csvReader().readAll(datasetFile)
+    val rows: List<List<String>> = runCatching { csvReader().readAll(datasetFile) }.getOrNull() ?: return HttpStatusCode.BadRequest
     return runCatching {
         client.post<HttpStatusCode>(configuration.URL + "/dataset") {
             contentType(ContentType.Application.Json)
@@ -78,7 +78,42 @@ suspend fun addDataset(
             )
         }
     }.getOrNull()
+}
 
+suspend fun updateDataset(
+    client: HttpClient,
+    configuration: Configuration,
+    name: String,
+    datasetFile: File
+): HttpStatusCode?
+{
+    @Serializable
+    data class Dataset(
+        val properties: List<String>,
+        val values: List<List<String>>
+    )
+
+    val rows: List<List<String>> = runCatching { csvReader().readAll(datasetFile) }.getOrNull() ?: return HttpStatusCode.BadRequest
+    return runCatching {
+        client.put<HttpStatusCode>(configuration.URL + "/dataset/$name".encodeURLPath()) {
+            contentType(ContentType.Application.Json)
+            body = Dataset(
+                rows[0],
+                rows.subList(1, rows.size)
+            )
+        }
+    }.getOrNull()
+}
+
+suspend fun deleteDataset(
+    client: HttpClient,
+    configuration: Configuration,
+    name: String,
+): HttpStatusCode?
+{
+    return runCatching {
+        client.delete<HttpStatusCode>(configuration.URL + "/dataset/$name".encodeURLPath())
+    }.getOrNull()
 }
 
 fun datasetFlow(client: HttpClient, configuration: Configuration): Flow<List<Dataset>>

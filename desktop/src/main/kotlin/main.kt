@@ -1,16 +1,22 @@
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.ktor.client.*
 import io.ktor.http.*
@@ -19,14 +25,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.swing.JFileChooser
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.ui.unit.IntSize
 
 fun main()
 {
-    Window(size = IntSize(1600,800)) {
+    Window(size = IntSize(1000, 800)) {
 //        var mutableConfiguration: Configuration? by remember { mutableStateOf(null) }
         var mutableConfiguration: Configuration? by remember {
             mutableStateOf(
@@ -71,63 +73,117 @@ fun main()
 @Composable
 private fun MainScreen(configuration: Configuration, onConfigurationInvalidate: () -> Unit)
 {
-    val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
     val client: HttpClient = remember { createHttpClient(configuration) }
     Text("Logged in as ${configuration.username}")
+    var message by remember { mutableStateOf("")}
+    Text(message)
     Spacer(Modifier.height(50.dp))
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
     {
-        AddDataset(client, configuration, onConfigurationInvalidate)
-        DatasetList(client, configuration, onConfigurationInvalidate)
+        AddDataset(client, configuration, onConfigurationInvalidate, onMessageChange = {message = it})
+        DatasetList(client, configuration, onConfigurationInvalidate, onMessageChange = {message = it})
     }
 
 }
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DatasetList(
     client: HttpClient,
     configuration: Configuration,
-    onConfigurationInvalidate: () -> Unit
+    onConfigurationInvalidate: () -> Unit,
+    onMessageChange: (String)->Unit = {}
 )
 {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
     //TODO add a loading bar
-    val datasets by datasetFlow(client, configuration).collectAsState(emptyList())
+    val datasets by datasetFlow(client, configuration).collectAsState(emptyList(), context = coroutineScope.coroutineContext)
     Box(
-        modifier = Modifier.width(400.dp))
+        modifier = Modifier.width(600.dp)
+    )
     {
         val state = rememberLazyListState()
         LazyColumn(state = state) {
             items(datasets) {
-                Dataset(it)
+                Dataset(it, configuration.username == it.username,
+                    onDeleteButtonPress = {
+                    coroutineScope.launch {
+                        when(deleteDataset(client, configuration, it.name))
+                        {
+                            HttpStatusCode.OK -> onMessageChange("Dataset deleted")
+                            HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
+                            null -> onMessageChange("Connection to server failed")
+                            else -> onMessageChange("Unknown error occurred")
+                        }
+                    }
+                },
+                    onUpdatePress = { file ->
+                        coroutineScope.launch {
+                            when (updateDataset(client, configuration, it.name, file))
+                            {
+                                HttpStatusCode.OK -> onMessageChange("Dataset updated")
+                                HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
+                                HttpStatusCode.Conflict -> onMessageChange("Invalid properties")
+                                HttpStatusCode.BadRequest -> onMessageChange("Invalid dataset")
+                                null -> onMessageChange("Connection to server failed")
+                                else -> onMessageChange("Unknown error occurred")
+                            }
+                        }
+                    })
             }
         }
-        /*VerticalScrollbar(
+        VerticalScrollbar(
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             adapter = rememberScrollbarAdapter(
                 scrollState = state,
                 itemCount = datasets.size,
                 averageItemSize = 20.dp // TextBox height + Spacer height
             )
-        )*/
+        )
     }
 
 }
 
 @Composable
-private fun Dataset(dataset: Dataset)
+private fun Dataset(
+    dataset: Dataset,
+    createdByUser: Boolean = false,
+    onDeleteButtonPress: () -> Unit = {},
+    onUpdatePress: (File) -> Unit = {}
+)
 {
     Surface(Modifier.fillMaxSize().padding(15.dp).clip(MaterialTheme.shapes.large)) {
-        Column(Modifier.padding(15.dp)) {
-            with(dataset)
-            {
-                Text("Name: $name")
-                Text("Color: ${color.toString(16)}")
-                Text("Properties: $properties")
-                Text("Owner: $username")
-                Text("Items: $items")
+        Row {
+            Column(Modifier.padding(15.dp).width(400.dp)) {
+                with(dataset)
+                {
+                    Text("Name: $name")
+                    Text("Color: ${color.toString(16)}")
+                    Text("Properties: $properties")
+                    Text("Creator: $username")
+                    Text("Items: $items")
+                }
             }
+            if (createdByUser)
+                Column(Modifier.width(40.dp)) {
+                    IconButton(onClick = onDeleteButtonPress)
+                    {
+                        Icon(Icons.Default.Delete, "Delete")
+                    }
+                    IconButton(onClick = {
+                        val fileChooser =
+                            JFileChooser(File("I:\\Preparation of Bachelors Thesis\\Bachelor Project\\Adaptive-Visualizer\\desktop\\data"))
+                        when (fileChooser.showOpenDialog(null))
+                        {
+                            JFileChooser.APPROVE_OPTION -> onUpdatePress(fileChooser.selectedFile)
+                        }
+                    })
+                    {
+                        Icon(Icons.Default.Edit, "Update")
+                    }
+                }
         }
+
     }
 }
 
@@ -135,7 +191,8 @@ private fun Dataset(dataset: Dataset)
 private fun AddDataset(
     client: HttpClient,
     configuration: Configuration,
-    onConfigurationInvalidate: () -> Unit
+    onConfigurationInvalidate: () -> Unit,
+    onMessageChange:(String) -> Unit = {}
 )
 {
     val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
@@ -166,7 +223,6 @@ private fun AddDataset(
                     Text(text)
                 }
             }
-            var message by remember { mutableStateOf("") }
             var adding by remember { mutableStateOf(false) }
             Button(onClick = {
                 if (!adding)
@@ -176,18 +232,18 @@ private fun AddDataset(
                         val currentFile = file
                         if (currentFile == null)
                         {
-                            message = "A file needs to be chosen"
+                            onMessageChange("A file needs to be chosen")
                         }
                         else
                         {
                             when (addDataset(client, configuration, name, color, currentFile))
                             {
-                                HttpStatusCode.OK -> message = "Dataset added"
+                                HttpStatusCode.OK -> onMessageChange("Dataset added")
                                 HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
-                                HttpStatusCode.Conflict -> message = "Dataset already exists"
-                                HttpStatusCode.BadRequest -> message = "Invalid dataset"
-                                null -> message = "Connection to server failed"
-                                else -> message = "Unknown error occured"
+                                HttpStatusCode.Conflict -> onMessageChange("Dataset already exists")
+                                HttpStatusCode.BadRequest -> onMessageChange("Invalid dataset")
+                                null -> onMessageChange("Connection to server failed")
+                                else -> onMessageChange("Unknown error occured")
                             }
                         }
                         adding = false
@@ -197,7 +253,6 @@ private fun AddDataset(
             {
                 Text("Add dataset")
             }
-            Text(message)
         }
 
     }
