@@ -21,11 +21,11 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 fun main() {
-    Window(title = "Scrollbars", size = IntSize(250, 400)) {
-        LazyScrollable()
-    }
+    println(0xFF3c003c == 0xFF3c003c.toString(16).toLong(16))
+    println(0xFF3c003c.toString(16))
 }
 
 @OptIn(ExperimentalFoundationApi::class)

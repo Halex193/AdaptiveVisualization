@@ -86,6 +86,7 @@ fun main()
                     Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    //TODO create universal progress bar indicator
                     var mutableMessage: Message? by remember { mutableStateOf(null) }
                     val configuration = mutableConfiguration
                     Box(Modifier.fillMaxWidth()) {
