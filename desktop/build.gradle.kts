@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val ktor_version: String by project
+val logback_version: String by project
 
 plugins {
     kotlin("jvm") version "1.4.32"
@@ -20,6 +21,8 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:0.4.0-build180")
+    implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")

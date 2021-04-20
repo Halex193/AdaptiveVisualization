@@ -1,68 +1,173 @@
 import androidx.compose.desktop.Window
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.VerticalScrollbar
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import io.ktor.client.*
-import io.ktor.http.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import java.awt.image.BufferedImage
 import java.io.File
+import java.security.Security
+import javax.imageio.ImageIO
 import javax.swing.JFileChooser
+
+fun getResource(path: String): File?
+{
+    return Thread.currentThread().contextClassLoader.getResource(path)?.toURI()?.let { File(it) }
+}
+
+fun getWindowIcon(): BufferedImage
+{
+    var image: BufferedImage? = null
+    try
+    {
+        image = ImageIO.read(getResource("images/icon.png"))
+    }
+    catch (e: Exception)
+    {
+        // image file does not exist
+        e.printStackTrace()
+    }
+
+    if (image == null)
+    {
+        image = BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB)
+    }
+
+    return image
+}
+
+data class Message(val text: String, val success: Boolean)
+
+val defaultConfiguration = Configuration(
+    "localhost:8080",
+    "admin",
+    "admin"
+)
 
 fun main()
 {
-    Window(size = IntSize(1000, 800)) {
+    System.setProperty("io.ktor.random.secure.random.provider", "DRBG")
+    Security.setProperty("securerandom.drbg.config", "HMAC_DRBG,SHA-512,256,pr_and_reseed")
+    Window(title = "Dataset Configuration", size = IntSize(1000, 800), icon = getWindowIcon()) {
 //        var mutableConfiguration: Configuration? by remember { mutableStateOf(null) }
         var mutableConfiguration: Configuration? by remember {
             mutableStateOf(
-                Configuration(
-                    "localhost:8080",
-                    "admin",
-                    "admin"
-                )
+                defaultConfiguration
             )
         }
         MaterialTheme(
             colors = lightColors(
                 background = Color(0xFF3C003C),
-                onBackground = Color.White
+                onBackground = Color.White,
+                surface = Color.White,
+                onSurface = Color.Black
             ),
-            shapes = Shapes(large = RoundedCornerShape(20.dp))
+            shapes = Shapes(large = RoundedCornerShape(20.dp), medium = RoundedCornerShape(10.dp))
         ) {
             Scaffold {
                 Column(
                     Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Dataset Configuration", style = MaterialTheme.typography.h4)
-                    Spacer(Modifier.height(50.dp))
+                    var mutableMessage: Message? by remember { mutableStateOf(null) }
                     val configuration = mutableConfiguration
+                    Box(Modifier.fillMaxWidth()) {
+                        Row(
+                            Modifier.align(Alignment.Center).wrapContentHeight(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                svgResource("images/icon.svg"),
+                                "Logo",
+                                modifier = Modifier.height(100.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                            Spacer(Modifier.width(30.dp))
+                            Text(
+                                "Adaptive Visualization\nDataset Configuration",
+                                style = MaterialTheme.typography.h4
+                            )
+                        }
+
+
+                        if (configuration != null)
+                            Row(
+                                Modifier.align(Alignment.CenterEnd),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(configuration.username)
+                                IconButton(onClick = {
+                                    mutableConfiguration = null
+                                    mutableMessage = Message("Logged out", true)
+                                })
+                                {
+                                    Icon(Icons.Filled.Logout, "Logout")
+                                }
+                            }
+                    }
+                    val message = mutableMessage
+                    val messageDimensions = Modifier.height(80.dp)
+                    if (message == null)
+                        Spacer(messageDimensions)
+                    else
+                        Surface(
+                            messageDimensions.padding(15.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .background(Color.White)
+
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Row(
+                                    Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    if (message.success)
+                                        Icon(Icons.Filled.Check, "Success")
+                                    else
+                                        Icon(Icons.Filled.Error, "Error")
+                                    Spacer(Modifier.width(10.dp))
+                                    Text(message.text)
+                                    Spacer(Modifier.width(10.dp))
+                                }
+                                IconButton(
+                                    onClick = { mutableMessage = null },
+                                    Modifier.height(15.dp).width(30.dp)
+                                )
+                                {
+                                    Icon(Icons.Filled.Clear, "Clear")
+                                }
+                                Spacer(Modifier.width(15.dp))
+                            }
+                        }
                     if (configuration == null)
                     {
-                        LoginScreen(onConfigurationChange = { mutableConfiguration = it })
+                        LoginScreen(
+                            onConfigurationChange = { mutableConfiguration = it },
+                            onNewMessage = { mutableMessage = it })
                     }
                     else
                     {
                         MainScreen(
                             configuration,
-                            onConfigurationInvalidate = { mutableConfiguration = null })
+                            onConfigurationInvalidate = { mutableConfiguration = null },
+                            onNewMessage = { mutableMessage = it })
                     }
                 }
             }
@@ -70,252 +175,13 @@ fun main()
     }
 }
 
-@Composable
-private fun MainScreen(configuration: Configuration, onConfigurationInvalidate: () -> Unit)
+fun chooseFile(): File?
 {
-    val client: HttpClient = remember { createHttpClient(configuration) }
-    Text("Logged in as ${configuration.username}")
-    var message by remember { mutableStateOf("")}
-    Text(message)
-    Spacer(Modifier.height(50.dp))
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
+    val fileChooser =
+        JFileChooser(File("I:\\Preparation of Bachelors Thesis\\Bachelor Project\\Adaptive-Visualizer\\desktop\\data"))
+    return when (fileChooser.showOpenDialog(null))
     {
-        AddDataset(client, configuration, onConfigurationInvalidate, onMessageChange = {message = it})
-        DatasetList(client, configuration, onConfigurationInvalidate, onMessageChange = {message = it})
-    }
-
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun DatasetList(
-    client: HttpClient,
-    configuration: Configuration,
-    onConfigurationInvalidate: () -> Unit,
-    onMessageChange: (String)->Unit = {}
-)
-{
-    val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
-    //TODO add a loading bar
-    val datasets by datasetFlow(client, configuration).collectAsState(emptyList(), context = coroutineScope.coroutineContext)
-    Box(
-        modifier = Modifier.width(600.dp)
-    )
-    {
-        val state = rememberLazyListState()
-        LazyColumn(state = state) {
-            items(datasets) {
-                Dataset(it, configuration.username == it.username,
-                    onDeleteButtonPress = {
-                    coroutineScope.launch {
-                        when(deleteDataset(client, configuration, it.name))
-                        {
-                            HttpStatusCode.OK -> onMessageChange("Dataset deleted")
-                            HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
-                            null -> onMessageChange("Connection to server failed")
-                            else -> onMessageChange("Unknown error occurred")
-                        }
-                    }
-                },
-                    onUpdatePress = { file ->
-                        coroutineScope.launch {
-                            when (updateDataset(client, configuration, it.name, file))
-                            {
-                                HttpStatusCode.OK -> onMessageChange("Dataset updated")
-                                HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
-                                HttpStatusCode.Conflict -> onMessageChange("Invalid properties")
-                                HttpStatusCode.BadRequest -> onMessageChange("Invalid dataset")
-                                null -> onMessageChange("Connection to server failed")
-                                else -> onMessageChange("Unknown error occurred")
-                            }
-                        }
-                    })
-            }
-        }
-        VerticalScrollbar(
-            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(
-                scrollState = state,
-                itemCount = datasets.size,
-                averageItemSize = 20.dp // TextBox height + Spacer height
-            )
-        )
-    }
-
-}
-
-@Composable
-private fun Dataset(
-    dataset: Dataset,
-    createdByUser: Boolean = false,
-    onDeleteButtonPress: () -> Unit = {},
-    onUpdatePress: (File) -> Unit = {}
-)
-{
-    Surface(Modifier.fillMaxSize().padding(15.dp).clip(MaterialTheme.shapes.large)) {
-        Row {
-            Column(Modifier.padding(15.dp).width(400.dp)) {
-                with(dataset)
-                {
-                    Text("Name: $name")
-                    Text("Color: ${color.toString(16)}")
-                    Text("Properties: $properties")
-                    Text("Creator: $username")
-                    Text("Items: $items")
-                }
-            }
-            if (createdByUser)
-                Column(Modifier.width(40.dp)) {
-                    IconButton(onClick = onDeleteButtonPress)
-                    {
-                        Icon(Icons.Default.Delete, "Delete")
-                    }
-                    IconButton(onClick = {
-                        val fileChooser =
-                            JFileChooser(File("I:\\Preparation of Bachelors Thesis\\Bachelor Project\\Adaptive-Visualizer\\desktop\\data"))
-                        when (fileChooser.showOpenDialog(null))
-                        {
-                            JFileChooser.APPROVE_OPTION -> onUpdatePress(fileChooser.selectedFile)
-                        }
-                    })
-                    {
-                        Icon(Icons.Default.Edit, "Update")
-                    }
-                }
-        }
-
-    }
-}
-
-@Composable
-private fun AddDataset(
-    client: HttpClient,
-    configuration: Configuration,
-    onConfigurationInvalidate: () -> Unit,
-    onMessageChange:(String) -> Unit = {}
-)
-{
-    val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
-    Surface(Modifier.width(400.dp).clip(MaterialTheme.shapes.large)) {
-        var name: String by remember { mutableStateOf("") }
-        var color: Int by remember { mutableStateOf("FFFFFF".toInt(16)) }
-        var file: File? by remember { mutableStateOf(null) }
-        Column(
-            Modifier.fillMaxWidth().padding(30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Name:")
-                TextField(name, onValueChange = { name = it })
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Color:")
-                TextField(color.toString(16), onValueChange = { color = it.toIntOrNull(16) ?: 0 })
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("File:")
-
-                Button(onClick = {
-                    coroutineScope.chooseFile { file = it }
-                })
-                {
-                    val text = file?.name ?: "Choose file..."
-                    Text(text)
-                }
-            }
-            var adding by remember { mutableStateOf(false) }
-            Button(onClick = {
-                if (!adding)
-                {
-                    adding = true
-                    coroutineScope.launch {
-                        val currentFile = file
-                        if (currentFile == null)
-                        {
-                            onMessageChange("A file needs to be chosen")
-                        }
-                        else
-                        {
-                            when (addDataset(client, configuration, name, color, currentFile))
-                            {
-                                HttpStatusCode.OK -> onMessageChange("Dataset added")
-                                HttpStatusCode.Unauthorized -> onConfigurationInvalidate()
-                                HttpStatusCode.Conflict -> onMessageChange("Dataset already exists")
-                                HttpStatusCode.BadRequest -> onMessageChange("Invalid dataset")
-                                null -> onMessageChange("Connection to server failed")
-                                else -> onMessageChange("Unknown error occured")
-                            }
-                        }
-                        adding = false
-                    }
-                }
-            }, enabled = !adding)
-            {
-                Text("Add dataset")
-            }
-        }
-
-    }
-
-}
-
-@Composable
-private fun LoginScreen(onConfigurationChange: (Configuration) -> Unit)
-{
-    val coroutineScope = rememberCoroutineScope { Dispatchers.Default }
-    var host by remember { mutableStateOf("") }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Host: ")
-        TextField(value = host, onValueChange = { host = it })
-    }
-
-    var username by remember { mutableStateOf("") }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Username: ")
-        TextField(value = username, onValueChange = { username = it })
-    }
-
-    var password by remember { mutableStateOf("") }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Password: ")
-        TextField(value = password, onValueChange = { password = it })
-    }
-
-    var connecting by remember { mutableStateOf(false) }
-    var error: String? by remember { mutableStateOf(null) }
-    Button(onClick = {
-        if (!connecting)
-        {
-            connecting = true
-            coroutineScope.launch {
-                val currentConfiguration =
-                    Configuration(host, username, password)
-                when (login(currentConfiguration))
-                {
-                    HttpStatusCode.OK -> onConfigurationChange(currentConfiguration)
-                    HttpStatusCode.Unauthorized -> error = "Invalid credentials"
-                    null -> error = "Connection could not be established"
-                    else -> error = "Unknown error occured"
-                }
-                connecting = false
-            }
-        }
-    }, enabled = !connecting)
-    {
-        Text("Connect")
-    }
-    error?.let { Text(text = it) }
-}
-
-private fun CoroutineScope.chooseFile(onFileChoose: (File?) -> Unit)
-{
-    launch {
-        val fileChooser =
-            JFileChooser(File("I:\\Preparation of Bachelors Thesis\\Bachelor Project\\Adaptive-Visualizer\\desktop\\data"))
-        when (fileChooser.showOpenDialog(null))
-        {
-            JFileChooser.APPROVE_OPTION -> onFileChoose(fileChooser.selectedFile)
-            else -> onFileChoose(null)
-        }
+        JFileChooser.APPROVE_OPTION -> fileChooser.selectedFile
+        else -> null
     }
 }

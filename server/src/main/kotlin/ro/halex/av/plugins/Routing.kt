@@ -41,14 +41,14 @@ fun Application.configureRouting(driver: Driver)
     fun get(): String
     {
         @Serializable
-        data class Dataset(val name: String, val color: Int, val properties: List<String>, val username: String, val items: Int)
+        data class Dataset(val name: String, val color: String, val properties: List<String>, val username: String, val items: Int)
 
         val result = driver.session().run("MATCH (u:User)-[:CREATED]->(d:Dataset)-[:CONTAINS]->(i:Item) RETURN d, u.username AS username, COUNT(i) AS items ORDER BY d.name")
         val value = result.list()?.map { record ->
             val node = record.get(0)?.asNode() ?: error("Data missing")
             val username = record.get(1)?.asString() ?: error("Data missing")
             val items = record.get(2)?.asInt() ?: error("Data missing")
-            Dataset(node["name"].asString(), node["color"].asInt(), node["properties"].asList { it.asString() }, username, items)
+            Dataset(node["name"].asString(), node["color"].asString(), node["properties"].asList { it.asString() }, username, items)
         }
         return Json.encodeToString(value)
     }
@@ -72,7 +72,7 @@ fun Application.configureRouting(driver: Driver)
             post<DatasetLocation> {
 
                 @Serializable
-                data class Dataset(val name: String, val color: Int, val properties: List<String>, val values: List<List<String>>)
+                data class Dataset(val name: String, val color: String, val properties: List<String>, val values: List<List<String>>)
 
                 val dataset: Dataset = call.receive()
                 dataset.values.find { it.size != dataset.properties.size }

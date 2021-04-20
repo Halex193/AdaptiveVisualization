@@ -10,6 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.utils.io.errors.*
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
@@ -54,14 +55,14 @@ suspend fun addDataset(
     client: HttpClient,
     configuration: Configuration,
     name: String,
-    color: Int,
+    color: String,
     datasetFile: File
 ): HttpStatusCode?
 {
     @Serializable
     data class Dataset(
         val name: String,
-        val color: Int,
+        val color: String,
         val properties: List<String>,
         val values: List<List<String>>
     )
@@ -124,6 +125,10 @@ fun datasetFlow(client: HttpClient, configuration: Configuration): Flow<List<Dat
             incoming.consumeAsFlow()
                 .mapNotNull { it as? Frame.Text }
                 .map { Json.decodeFromString<List<Dataset>>(it.readText()) }
+                .catch {
+                    close()
+                    throw it
+                }
                 .collect { emit(it) }
         }
         throw IOException("WebSocket disconnected")
