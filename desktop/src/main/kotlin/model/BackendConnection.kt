@@ -1,3 +1,5 @@
+package model
+
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -10,7 +12,6 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
 import io.ktor.utils.io.errors.*
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.Serializable
@@ -18,22 +19,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.File
 
-suspend fun login(configuration: Configuration): HttpStatusCode?
-{
-    return HttpClient(CIO) {
-        expectSuccess = false
-
-        install(Auth) {
-            basic {
-                this.sendWithoutRequest = true
-                this.username = configuration.username
-                this.password = configuration.password
-            }
-        }
-    }.use { runCatching { it.get<HttpStatusCode>(configuration.URL + "/login") }.getOrNull() }
-}
-
-fun createHttpClient(configuration: Configuration) = HttpClient(CIO) {
+fun createHttpClient(configuration: Configuration): HttpClient = HttpClient(CIO) {
     expectSuccess = false
 
     install(JsonFeature) {
@@ -49,6 +35,21 @@ fun createHttpClient(configuration: Configuration) = HttpClient(CIO) {
             this.password = configuration.password
         }
     }
+}
+
+suspend fun login(configuration: Configuration): HttpStatusCode?
+{
+    return HttpClient(CIO) {
+        expectSuccess = false
+
+        install(Auth) {
+            basic {
+                this.sendWithoutRequest = true
+                this.username = configuration.username
+                this.password = configuration.password
+            }
+        }
+    }.use { runCatching { it.get<HttpStatusCode>(configuration.url + "/login") }.getOrNull() }
 }
 
 suspend fun addDataset(
@@ -69,7 +70,7 @@ suspend fun addDataset(
 
     val rows: List<List<String>> = runCatching { csvReader().readAll(datasetFile) }.getOrNull() ?: return HttpStatusCode.BadRequest
     return runCatching {
-        client.post<HttpStatusCode>(configuration.URL + "/dataset") {
+        client.post<HttpStatusCode>(configuration.url + "/dataset") {
             contentType(ContentType.Application.Json)
             body = Dataset(
                 name,
@@ -96,7 +97,7 @@ suspend fun updateDataset(
 
     val rows: List<List<String>> = runCatching { csvReader().readAll(datasetFile) }.getOrNull() ?: return HttpStatusCode.BadRequest
     return runCatching {
-        client.put<HttpStatusCode>(configuration.URL + "/dataset/$name".encodeURLPath()) {
+        client.put<HttpStatusCode>(configuration.url + "/dataset/$name".encodeURLPath()) {
             contentType(ContentType.Application.Json)
             body = Dataset(
                 rows[0],
@@ -113,14 +114,14 @@ suspend fun deleteDataset(
 ): HttpStatusCode?
 {
     return runCatching {
-        client.delete<HttpStatusCode>(configuration.URL + "/dataset/$name".encodeURLPath())
+        client.delete<HttpStatusCode>(configuration.url + "/dataset/$name".encodeURLPath())
     }.getOrNull()
 }
 
 fun datasetFlow(client: HttpClient, configuration: Configuration): Flow<List<Dataset>>
 {
     return flow {
-        client.webSocket(configuration.webSocketURL + "/dataset")
+        client.webSocket(configuration.webSocketUrl + "/dataset")
         {
             incoming.consumeAsFlow()
                 .mapNotNull { it as? Frame.Text }
