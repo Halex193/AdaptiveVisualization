@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import model.Configuration
-import model.createHttpClient
 import model.defaultConfiguration
 import view.Message
 
@@ -27,8 +26,7 @@ class LoginViewModel(private val mainViewModel: MainViewModel)
             {
                 HttpStatusCode.OK ->
                 {
-                    mainViewModel.client = createHttpClient(currentConfiguration)
-                    mainViewModel.configuration.value = currentConfiguration
+                    mainViewModel.createConfiguration(currentConfiguration)
                     mainViewModel.message.value = Message("Logged in", true)
                 }
                 HttpStatusCode.Unauthorized -> mainViewModel.message.value =

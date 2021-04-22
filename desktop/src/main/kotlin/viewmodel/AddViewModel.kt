@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import model.FileDetails
@@ -14,7 +15,7 @@ import model.defaultName
 import view.Message
 import view.chooseFile
 
-class AddViewModel(private val mainViewModel: MainViewModel)
+class AddViewModel(private val mainViewModel: MainViewModel, val client: HttpClient)
 {
     val name: MutableState<String> = mutableStateOf(defaultName)
     val selectedColor: MutableState<Long> = mutableStateOf(defaultColor)
@@ -47,70 +48,50 @@ class AddViewModel(private val mainViewModel: MainViewModel)
             {
                 currentFile == null ->
                 {
-                    message =
-                        Message(
-                            "You need to choose a file for the dataset",
-                            false
-                        )
+                    message = Message("You need to choose a file for the dataset", false)
 
                 }
                 name.value == "" ->
                 {
-                    message =
-                        Message(
-                            "You need to choose a name for the dataset",
-                            false
-                        )
+                    message = Message("You need to choose a name for the dataset", false)
 
                 }
                 else ->
                 {
                     val currentConfiguration = mainViewModel.configuration.value ?: return@launch
                     when (addDataset(
-                        mainViewModel.client,
+                        client,
                         currentConfiguration,
                         name.value,
                         selectedColor.value.toString(16),
                         currentFile.fileObject
                     ))
                     {
-                        HttpStatusCode.OK -> message =
-                            Message(
-                                "Dataset added",
-                                true
-                            )
+                        HttpStatusCode.OK ->
+                        {
+                            message = Message("Dataset added", true)
+                            name.value = defaultName
+                            selectedColor.value = defaultColor
+                            file.value = null
+                        }
 
                         HttpStatusCode.Unauthorized ->
                         {
                             message = Message("Credentials  invalid!", false)
-                            mainViewModel.configuration.value = null
+                            mainViewModel.destroyConfiguration()
                         }
                         HttpStatusCode.Conflict -> message =
-                            Message(
-                                "Dataset already exists",
-                                false
-                            )
+                            Message("Dataset already exists", false)
 
-                        HttpStatusCode.BadRequest -> message =
-                            Message(
-                                "Invalid dataset",
-                                false
-                            )
+                        HttpStatusCode.BadRequest -> message = Message("Invalid dataset", false)
 
-                        null -> message =
-                            Message(
-                                "Connection to server failed",
-                                false
-                            )
+                        null -> message = Message("Connection to server failed", false)
 
                         else -> message = Message("Unknown error occured", false)
                     }
                 }
             }
             adding.value = false
-            name.value = defaultName
-            selectedColor.value = defaultColor
-            file.value = null
         }
 
     }

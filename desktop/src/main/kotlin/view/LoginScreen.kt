@@ -22,6 +22,8 @@ fun LoginScreen(loginViewModel: LoginViewModel)
 
             val columnSpacing = Modifier.padding(10.dp)
             val rowSpacing = Modifier.width(5.dp)
+            Text("Server connection details", style = MaterialTheme.typography.h6)
+            Spacer(columnSpacing)
             Column(Modifier, horizontalAlignment = Alignment.End) {
                 Row(columnSpacing, verticalAlignment = Alignment.CenterVertically) {
                     Text("Host")

@@ -32,7 +32,7 @@ fun AddDataset(addViewModel: AddViewModel)
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Create dataset", style = MaterialTheme.typography.h6)
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(20.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.width(5.dp))
                 TextField(name, onValueChange = { name = it })

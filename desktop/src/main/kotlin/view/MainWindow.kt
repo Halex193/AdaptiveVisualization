@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.svgResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import model.createHttpClient
 import viewmodel.LoginViewModel
 import viewmodel.MainViewModel
 import java.io.File
@@ -42,7 +43,6 @@ fun MainWindow(mainViewModel: MainViewModel)
         ),
         shapes = Shapes(large = RoundedCornerShape(20.dp), medium = RoundedCornerShape(10.dp))
     ) {
-        var mutableConfiguration by mainViewModel.configuration
         Scaffold {
             Column(
                 Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 10.dp),
@@ -57,7 +57,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                         mutableMessage = null
                     }
                 }
-                val configuration = mutableConfiguration
+                val configuration = mainViewModel.configuration.value
                 Box(Modifier.fillMaxWidth()) {
                     Row(
                         Modifier.align(Alignment.Center).wrapContentHeight(),
@@ -84,7 +84,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                         ) {
                             Text(configuration.username)
                             IconButton(onClick = {
-                                mutableConfiguration = null
+                                mainViewModel.destroyConfiguration()
                                 mutableMessage = Message("Logged out", true)
                             })
                             {
@@ -128,7 +128,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                     }
                 if (configuration == null)
                 {
-                    LoginScreen(LoginViewModel(mainViewModel))
+                    LoginScreen(mainViewModel.loginViewModel)
                 }
                 else
                 {
