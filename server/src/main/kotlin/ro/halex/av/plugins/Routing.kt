@@ -20,22 +20,27 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.*
 import org.neo4j.driver.Driver
 import org.neo4j.driver.Transaction
 
-@Serializable
-data class NestingRelationshipElement(val property: String, val value: String? = null, val sort: String)
-
-typealias NestingRelationship = List<NestingRelationshipElement>
-
-interface Node
+interface NestingRelationshipElement
 
 @Serializable
-data class InnerNode(val children: Map<String, Node>) : Node
+data class ValuedProperty(val property: String, val value: String, val sort: String = "incr")
 
 @Serializable
-data class LeafNode(val data: List<Map<String, String>>) : Node
+data class ClassificationProperty(val property: String, val sort: String = "incr")
+
+@Serializable
+data class GroupedProperty(val property: String, val sort: String = "incr")
+
+@Serializable
+data class NestingRelationship(
+    val valuedProperties: List<ValuedProperty>,
+    val classificationProperties: List<ClassificationProperty>,
+    val groupedProperties: List<GroupedProperty>
+)
 
 @Serializable
 data class Dataset(
@@ -83,97 +88,6 @@ fun Application.configureRouting(driver: Driver)
         } ?: emptyList()
     }
 
-    fun Transaction.getDataByRelationship(
-        nestingRelationship: NestingRelationship,
-        datasetName: String
-    ): List<Map<String, String>>
-    {
-        val query = buildString {
-            append("MATCH (d:Dataset)")
-            for (i in nestingRelationship.indices)
-                append("-[g$i:GROUPED]->()")
-
-            append("-[:CONTAINS]-(i:Item) ")
-            append("WHERE d.name=\$name ")
-            for (i in nestingRelationship.indices)
-                append("AND g$i=\$g$i ")
-            append("RETURN i")
-        }
-        val parameters = buildMap<String, String> {
-            put("name", datasetName)
-            nestingRelationship.forEachIndexed { index, (property, value, _) ->
-                put("g${index}.property", property)
-                put("g${index}.value", value ?: error("Value was null"))
-            }
-        }
-        return run(query, parameters).list().map { record ->
-            record[0].asMap { it.asString() } - nestingRelationship.map { it.property }
-        }
-    }
-
-    fun Transaction.getValuesByRelationship(nestingRelationship: NestingRelationship, datasetName: String): List<String>
-    {
-        val query = buildString {
-            append("MATCH (d:Dataset)")
-            for (i in nestingRelationship.indices)
-                append("-[g$i:GROUPED]->()")
-
-            append("WHERE d.name=\$name ")
-            for (i in 0 until nestingRelationship.size - 1)
-                append("AND g$i=\$g$i ")
-            append("RETURN g${nestingRelationship.size - 1}.value")
-        }
-        val parameters = buildMap<String, String> {
-            put("name", datasetName)
-            nestingRelationship.forEachIndexed { index, (property, value, _) ->
-                put("g${index}.property", property)
-                put("g${index}.value", value ?: error("Value was null"))
-            }
-        }
-        return run(query, parameters).list().map { record -> record[0].asString() }
-    }
-
-    fun Transaction.getValuesByRelationshipOrClassify(
-        nestingRelationship: NestingRelationship,
-        datasetName: String
-    ): List<String>
-    {
-        return this.getValuesByRelationship(nestingRelationship, datasetName).ifEmpty {
-            val parentNestingRelationship = nestingRelationship.slice(0 until nestingRelationship.size - 1)
-            val data = getDataByRelationship(parentNestingRelationship, datasetName)
-            if (data.isEmpty())
-                error("Previous dataset was not classified")
-            val property = nestingRelationship.last().property
-            data.groupBy { it[property] ?: error("Null value found") }.onEach { (value, items) ->
-                val query = buildString {
-                    append("MATCH (d:Dataset)")
-                    for (i in 0 until parentNestingRelationship.size - 1)
-                        append("-[g$i:GROUPED]->()")
-                    append("-[g${parentNestingRelationship.size - 1}:GROUPED]->(p:Itemset), (i:Item) ")
-                    append("WHERE d.name=\$name AND i=\$item")
-                    for (i in parentNestingRelationship.indices)
-                        append("AND g$i=\$g$i ")
-                    append("CREATE (p)-[g:GROUPED {property=\$property,value=\$value}]->(:Itemset)-[:CONTAINS]->(i)")
-                    //TOD check if it gives an error because it already exists
-                }
-                val parameters = buildMap<String, Any> {
-                    put("name", datasetName)
-                    put("property", property)
-                    put("value", value)
-                    nestingRelationship.forEachIndexed { index, (property, value, _) ->
-                        put("g${index}.property", property)
-                        put("g${index}.value", value ?: error("Value was null"))
-                    }
-                }.toMutableMap()
-                items.forEach { item ->
-                    run(query, parameters.also { it["item"] = item })
-                }
-            }.keys.toList()
-        }
-    }
-
-
-
     routing {
         get("/") {
             call.respondText("Server working!")
@@ -183,47 +97,66 @@ fun Application.configureRouting(driver: Driver)
         }
         get<DatasetLocation.Name> { location ->
             val datasetName = location.name
-            val relationship = call.receive<List<NestingRelationshipElement>>()
-            /*val result = driver.session().run(
-                "MATCH (d:Dataset) WHERE d.name=\$name RETURN d.properties",
+            val relationship = call.receive<NestingRelationship>()
+            val result = driver.session().run(
+                "MATCH (d:Dataset) WHERE d.name=\$name RETURN id(d), d.properties",
                 mapOf("name" to datasetName)
+            ).single()
+            val datasetId = result[0].asInt()
+            val properties = result[1].asList { it.asString() }
+            if (
+                !relationship.valuedProperties.all { it.property in properties } ||
+                !relationship.classificationProperties.all { it.property in properties } ||
+                !relationship.groupedProperties.all { it.property in properties }
             )
-            val properties = result.single()[0].asList { it.asString() }*/
-            //TODO validate properties and continuity of valued properties
-
-            fun createTree(nestingRelationship: NestingRelationship, transaction: Transaction): Node
             {
-                val index = nestingRelationship.indexOfFirst { it.value == null } - 1
-                return if (index == nestingRelationship.size)
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val transaction = driver.session().beginTransaction()
+            val firstNonValuedItemsetId =
+                relationship.valuedProperties
+                    .fold(datasetId) { currentId, (property, value, _) ->
+                        transaction.getGroupingItemsetId(currentId, property, value) ?: run {
+                            transaction.classify(currentId, property)
+                            transaction.getGroupingItemsetId(currentId, property, value)
+                                ?: error("Classification failed")
+                        }
+                    }
+
+            fun createTree(currentId: Int, classificationProperties: List<ClassificationProperty>): JsonElement
+            {
+                return if (classificationProperties.isEmpty())
                 {
-                    LeafNode(transaction.getDataByRelationship(nestingRelationship, datasetName))
+                    val items = transaction.getContentsOfItemset(
+                        currentId,
+                        projection = relationship.groupedProperties.map { it.property }).distinct()
+                    JsonArray(items.map { JsonObject(it.mapValues { (_, value) -> JsonPrimitive(value) }) })
                 }
                 else
                 {
-                    val valuesRelationship = nestingRelationship.slice(0..index)
-                    val values =
-                        transaction.getValuesByRelationship(valuesRelationship, datasetName)
-                    values.associateWith { value ->
-                        LeafNode(
-                            transaction.getDataByRelationship(
-                                valuesRelationship.toMutableList()
-                                    .also { it[index] = it[index].copy(value = value) },
-                                datasetName
-                            )
-                        )
-                    }.let { InnerNode(it) }
+                    val property = classificationProperties.first().property
+                    val values = transaction.getValuesAndItemsets(currentId, property).ifEmpty {
+                        transaction.classify(currentId, property)
+                        transaction.getValuesAndItemsets(currentId, property)
+                    }
+                    values.mapValues { (_, itemsetId) ->
+                        createTree(itemsetId, classificationProperties.subList(1, classificationProperties.size))
+                    }.let { JsonObject(it) }
                 }
             }
-            val transaction = driver.session().beginTransaction()
-            call.respond(HttpStatusCode.OK, createTree(relationship, transaction))
+
+            val json = createTree(firstNonValuedItemsetId, relationship.classificationProperties)
             transaction.commit()
+            call.respond(HttpStatusCode.OK, json)
+        }
+        webSocket("/dataset") {
+            datasetUpdateEvent.collect {
+                send(Json.encodeToString(getDatasets()))
+            }
         }
         authenticate("administrator") {
-            webSocket("/dataset") {
-                datasetUpdateEvent.collect {
-                    send(Json.encodeToString(getDatasets()))
-                }
-            }
             get("/login") {
                 call.respondText("Credentials valid!")
             }
@@ -344,6 +277,52 @@ fun Application.configureRouting(driver: Driver)
             }
         }
     }
+}
+
+private fun Transaction.getValuesAndItemsets(currentId: Int, property: String): Map<String, Int>
+{
+    return run(
+        "MATCH (i)-[g:GROUPED]->(is:Itemset) WHERE id(i)=\$id RETURN g.value, id(is)",
+        mapOf("id" to currentId)
+    ).list()
+        .map { record -> record[0].asString() to record[1].asInt() }.toMap()
+}
+
+fun Transaction.getContentsOfItemset(
+    id: Int,
+    projection: List<String>
+): List<Map<String, String>>
+{
+    return run("MATCH (i)-[:CONTAINS]->(item) WHERE id(i)=\$id RETURN item", mapOf("id" to id)).list().map { record ->
+        record[0].asMap { it.asString() }.filterKeys { it in projection }
+    }
+}
+
+private fun Transaction.classify(currentId: Int, property: String)
+{
+    val items = run("MATCH (s)-[:CONTAINS]-(i) WHERE id(s)=\$id RETURN id(i), i", mapOf("id" to currentId)).list()
+        .map { record -> record[0].asInt() to record[1][property].asString() }
+
+
+    items.groupBy { it.second }.mapValues { (_, value) -> value.map { it.first } }.onEach { (value, itemIds) ->
+        val itemsetId = run(
+            "MATCH (s) WHERE id(s)=\$id CREATE (s)-[g:GROUPED {property:\$property,value:\$value}]->(i:Itemset) RETURN id(i)",
+            mapOf("id" to currentId, "property" to property, "value" to value)
+        ).single()[0].asInt()
+
+        run(
+            "MATCH (i), (item) WHERE id(i)=\$id AND id(item) IN \$itemIds CREATE (i)-[:CONTAINS]->(item) ",
+            mapOf("id" to itemsetId, "itemIds" to itemIds)
+        )
+    }
+}
+
+private fun Transaction.getGroupingItemsetId(currentId: Int, property: String, value: String): Int?
+{
+    return run(
+        "MATCH (i)-[g:GROUPED]->(i2) WHERE id(i)=\$id AND g.property=\$property AND g.value=\$value RETURN id(i2)",
+        mapOf("id" to currentId, "property" to property, "value" to value)
+    ).list().firstOrNull()?.get(0)?.asInt()
 }
 
 @Location("/dataset")
