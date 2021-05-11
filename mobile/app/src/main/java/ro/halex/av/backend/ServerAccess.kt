@@ -9,7 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.json.JsonObject
 
-const val serverURL = "http://192.168.0.193:8080"
+const val defaultConnectionURL = "http://192.168.0.193:8080"
 
 fun createHttpClient(): HttpClient = HttpClient(CIO) {
     // expectSuccess = false
@@ -19,16 +19,16 @@ fun createHttpClient(): HttpClient = HttpClient(CIO) {
     }
 }
 
-suspend fun HttpClient.getDatasets(): List<DatasetDTO>?
+suspend fun HttpClient.getDatasets(connectionURL: String): List<DatasetDTO>?
 {
     return runCatching {
-        get<List<DatasetDTO>>("$serverURL/dataset")
+        get<List<DatasetDTO>>("$connectionURL/dataset")
     }.onFailure { Log.e("ServerAccess", it.stackTraceToString()) }.getOrNull()
 }
 
-suspend fun HttpClient.getDataset(name: String, nestingRelationship: NestingRelationship): JsonObject?
+suspend fun HttpClient.getDataset(connectionURL: String, name: String, nestingRelationship: NestingRelationship): JsonObject?
 {
     return runCatching {
-        get<JsonObject>("$serverURL/$name".encodeURLPath())
+        get<JsonObject>("$connectionURL/$name".encodeURLPath())
     }.onFailure { Log.e("ServerAccess", it.stackTraceToString()) }.getOrNull()
 }
