@@ -67,4 +67,5 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:1.5.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
     implementation("io.ktor:ktor-client-serialization:1.5.4")
+    implementation("androidx.navigation:navigation-compose:1.0.0-alpha10")
 }

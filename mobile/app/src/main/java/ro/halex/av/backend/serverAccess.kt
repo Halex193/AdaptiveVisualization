@@ -12,7 +12,7 @@ import kotlinx.serialization.json.JsonObject
 const val serverURL = "http://192.168.0.193:8080"
 
 fun createHttpClient(): HttpClient = HttpClient(CIO) {
-    expectSuccess = false
+    // expectSuccess = false
 
     install(JsonFeature) {
         serializer = KotlinxSerializer()
@@ -22,7 +22,7 @@ fun createHttpClient(): HttpClient = HttpClient(CIO) {
 suspend fun HttpClient.getDatasets(): List<DatasetDTO>?
 {
     return runCatching {
-        get<List<DatasetDTO>>(serverURL)
+        get<List<DatasetDTO>>("$serverURL/dataset")
     }.onFailure { Log.e("ServerAccess", it.stackTraceToString()) }.getOrNull()
 }
 

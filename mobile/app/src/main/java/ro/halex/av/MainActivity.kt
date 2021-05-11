@@ -3,15 +3,16 @@ package ro.halex.av
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigate
+import androidx.navigation.compose.rememberNavController
+import ro.halex.av.ui.screen.AdaptScreen
+import ro.halex.av.ui.screen.DataScreen
+import ro.halex.av.ui.screen.MainScreen
 import ro.halex.av.ui.theme.AdaptiveVisualizationTheme
-import ro.halex.av.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity()
 {
@@ -20,23 +21,15 @@ class MainActivity : ComponentActivity()
         super.onCreate(savedInstanceState)
         setContent {
             AdaptiveVisualizationTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
-                    val viewModel = viewModel<MainViewModel>()
-                    LaunchedEffect(null) {
-                        viewModel.getAndLogDatasets()
-                    }
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "data") {
+                    composable("main") { MainScreen(onAdaptPress = {navController.navigate("adapt")}) }
+                    composable("adapt") { AdaptScreen(onDataPress = {navController.navigate("data")}) { navController.navigateUp() } }
+                    composable("data") { DataScreen(onBackPress = {navController.navigateUp()}) }
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String)
-{
-    Text(text = "Hello $name!")
 }
 
 @Preview(showBackground = true)
@@ -44,6 +37,6 @@ fun Greeting(name: String)
 fun DefaultPreview()
 {
     AdaptiveVisualizationTheme {
-        Greeting("Android")
+
     }
 }

@@ -5,31 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="906fa6d0-84bf-4f79-8462-df8e8a6f34f0" name="Default Changelist" comment="Polish interface, fix consistency">
-      <change afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/MainApplication.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/Models.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/main.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/BackendConnection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/BackendConnection.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/Configuration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/Configuration.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/Dataset.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/Dataset.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/DatasetColors.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/DatasetColors.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/Defaults.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/Defaults.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/model/FileDetails.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/FileDetails.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/view/AddDatasetScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/AddDatasetScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/view/DatasetScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/DatasetScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/view/LoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/LoginScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/view/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/MainScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/view/MainWindow.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/MainWindow.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/viewmodel/AddViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/viewmodel/AddViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/viewmodel/DatasetListViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/viewmodel/DatasetListViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/viewmodel/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/viewmodel/LoginViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/viewmodel/MainViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/viewmodel/MainViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../server/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/serverAccess.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/serverAccess.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/MainViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/MainViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -254,7 +233,8 @@
       <workItem from="1619636658458" duration="617000" />
       <workItem from="1619677790368" duration="4096000" />
       <workItem from="1620626344088" duration="206000" />
-      <workItem from="1620661889378" duration="2074000" />
+      <workItem from="1620661889378" duration="2360000" />
+      <workItem from="1620712936532" duration="6000" />
     </task>
     <task id="LOCAL-00001" summary="Make CRUD operations work">
       <created>1618827432284</created>
