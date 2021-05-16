@@ -6,15 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="906fa6d0-84bf-4f79-8462-df8e8a6f34f0" name="Default Changelist" comment="Polish interface, fix consistency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/Models.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/Models.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/ServerAccess.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/ServerAccess.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/DataScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/DataScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/MainScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/Modules.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/Modules.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/theme/Theme.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/theme/Theme.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/DataViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/DataViewModel.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../server/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/Application.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/DatabaseOperations.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/DatabaseOperations.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Neo4JDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Neo4JDriver.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/src/main/resources/application.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/resources/application.conf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../server/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Serialization.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Serialization.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +37,17 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="desktop" type="f1a62948:ProjectNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="desktop" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="desktop" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
@@ -88,7 +98,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="add_unversioned_files" value="$PROJECT_DIR$/data/People.csv" />
+    <property name="add_unversioned_files" value="$PROJECT_DIR$/data/People.csv&#10;I:/Preparation of Bachelors Thesis/Bachelor Project/Adaptive-Visualizer/desktop/data/Warehouse.csv" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/data" />
     <property name="node.js.detected.package.eslint" value="true" />
@@ -132,6 +142,38 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="desktop [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
     </configuration>
     <configuration name="desktop [packageMsi]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
@@ -207,6 +249,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.desktop [clean]" />
         <item itemvalue="Gradle.desktop [packageMsi]" />
         <item itemvalue="Application.TestKt" />
       </list>
@@ -243,6 +286,7 @@
       <workItem from="1620712936532" duration="6000" />
       <workItem from="1620894908926" duration="521000" />
       <workItem from="1621090751382" duration="17000" />
+      <workItem from="1621193151805" duration="369000" />
     </task>
     <task id="LOCAL-00001" summary="Make CRUD operations work">
       <created>1618827432284</created>
