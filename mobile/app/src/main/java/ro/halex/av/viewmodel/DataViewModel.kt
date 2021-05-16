@@ -5,10 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 import ro.halex.av.backend.*
@@ -29,6 +26,13 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     {
         viewModelScope.launch {
             mutableConnectionURL.value = connectionDataStore.data.first() ?: ""
+            val datasetInfo = datasetInfoDataStore.data.first() ?: return@launch
+            getDatasets()
+            mutableSelectedDataset.value = datasetInfo
+            val relationship = nestingRelationshipDataStore.data.firstOrNull() ?: return@launch
+            val elementList =
+                relationship.valuedProperties + relationship.classificationProperties + relationship.groupedProperties
+            mutableNestingElementList.addAll(elementList)
         }
     }
 
@@ -47,6 +51,7 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     fun selectDataset(dataset: DatasetDTO)
     {
         mutableSelectedDataset.value = dataset
+        mutableNestingElementList.clear()
     }
 
     fun addNestingElement()

@@ -1,6 +1,7 @@
 package ro.halex.av.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
@@ -31,24 +32,31 @@ fun DataScreen(onBackPress: () -> Unit)
                 }
 
             }
-            item {
-                Button(onClick = viewModel::getDatasets) {
-                    Text("Get datasets")
+            val datasets = viewModel.datasets.value
+            if(datasets == null)
+                item {
+                    Button(onClick = viewModel::getDatasets) {
+                        Text("Get datasets")
+                    }
                 }
-            }
-            val datasets = viewModel.datasets.value ?: return@LazyColumn
+
+            datasets ?: return@LazyColumn
             item {
                 var expanded by remember { mutableStateOf(false) }
                 val selectedDataset by viewModel.selectedDataset
                 Box(
                     Modifier
+                        .padding(5.dp)
                         .clickable { expanded = true }
                         .background(
                             Color(
                                 selectedDataset?.color?.toLongOrNull(16) ?: 0xFFFFFFFF
                             )
-                        )) {
-                    Text(text = selectedDataset?.name ?: "No dataset selected")
+                        )
+                        .padding(5.dp)
+                )
+                {
+                    Text(text = selectedDataset?.name ?: "No dataset selected", color = Color.White)
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         datasets.forEach { dataset ->
                             DropdownMenuItem(onClick = {
@@ -64,10 +72,14 @@ fun DataScreen(onBackPress: () -> Unit)
 
             val selectedDataset = viewModel.selectedDataset.value ?: return@LazyColumn
             val nestingElementList = viewModel.mutableNestingElementList
-
+            val color = Color(selectedDataset.color.toLongOrNull(16) ?: 0xFFFFFFFF)
             itemsIndexed(nestingElementList) { index, nestingElement ->
-
-                Column {
+                Column(
+                    Modifier
+                        .padding(5.dp)
+                        .fillMaxWidth()
+                        .border(2.dp, color)
+                        .padding(5.dp)) {
                     run block@{
                         Row {
                             Box {
@@ -86,7 +98,7 @@ fun DataScreen(onBackPress: () -> Unit)
                                     availableProperties.forEach {
                                         DropdownMenuItem(onClick = {
                                             expanded = false
-                                            nestingElementList[index] = SimpleProperty(it)
+                                            nestingElementList[index] = ClassificationProperty(it)
                                         }) {
                                             Text(it)
                                         }
@@ -230,7 +242,7 @@ fun DataScreen(onBackPress: () -> Unit)
                 } else
                 {
                     var loading by remember { mutableStateOf(false) }
-                    Row {
+                    Row(Modifier.padding(5.dp)) {
                         Button(onClick = {
                             viewModel.save(onSaveFinished = onBackPress)
                             loading = true
