@@ -17,7 +17,8 @@ fun main(args: Array<String>): Unit =
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false)
 {
-    val driver: Driver = createDriver()
+    val database = environment.config.propertyOrNull("ktor.database")?.getString() ?: "localhost"
+    val driver: Driver = createDriver(database)
     configureAuthentication(driver)
     configureSockets()
     configureRouting(driver)

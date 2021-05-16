@@ -6,7 +6,7 @@ import org.neo4j.driver.Transaction
 fun Transaction.getDatasetNode(datasetName: String): DatasetNode?
 {
     val result = run(
-        "MATCH (u:User)-[:CREATED]->(d:Dataset) WHERE d.name=\$name RETURN id(d) AS id, u.username AS username d.name AS name, d.color AS color d.properties AS properties",
+        "MATCH (u:User)-[:CREATED]->(d:Dataset) WHERE d.name=\$name RETURN id(d) AS id, u.username AS username, d.name AS name, d.color AS color, d.properties AS properties",
         mapOf("name" to datasetName)
     ).list().firstOrNull() ?: return null
 
@@ -15,7 +15,7 @@ fun Transaction.getDatasetNode(datasetName: String): DatasetNode?
         result["username"].asString(),
         result["name"].asString(),
         result["color"].asString(),
-        result["properties"].asList { it.toString() }
+        result["properties"].asList { it.asString() }
     )
 }
 

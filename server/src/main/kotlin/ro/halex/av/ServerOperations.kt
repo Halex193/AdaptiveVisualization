@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import org.neo4j.driver.Driver
+import org.neo4j.driver.TransactionConfig
 import ro.halex.av.plugins.DatasetLocation
+import java.time.Duration
 
 suspend fun PipelineContext<Unit, ApplicationCall>.getDatasets(driver: Driver)
 {
@@ -34,7 +36,7 @@ suspend fun DefaultWebSocketServerSession.updateWebSocket(
 suspend fun PipelineContext<Unit, ApplicationCall>.getClassifiedDataset(driver: Driver, datasetName: String)
 {
     val relationship = call.receive<NestingRelationship>()
-    val datasetNode = driver.session().readTransaction { it.getDatasetNode(datasetName)  }?: run {
+    val datasetNode = driver.session().readTransaction { it.getDatasetNode(datasetName) } ?: run {
         call.respond(HttpStatusCode.NotFound)
         return
     }
@@ -46,46 +48,88 @@ suspend fun PipelineContext<Unit, ApplicationCall>.getClassifiedDataset(driver: 
         !relationship.groupedProperties.all { it.property in properties }
     )
     {
-        call.respond(HttpStatusCode.BadRequest)
+        call.respond(HttpStatusCode.BadRequest, "The set of properties was invalid")
         return
     }
 
-    val transaction = driver.session().beginTransaction()
-    val firstNonValuedItemsetId =
-        relationship.valuedProperties
-            .fold(datasetId) { currentId, (property, value, _) ->
-                transaction.getGroupingItemsetId(currentId, property, value) ?: run {
-                    transaction.classify(currentId, property)
-                    transaction.getGroupingItemsetId(currentId, property, value)
-                        ?: error("Classification failed")
-                }
-            }
+    application.log.info("Dataset '$datasetName' queried by $relationship")
 
-    fun createTree(currentId: Int, classificationProperties: List<ClassificationProperty>): JsonElement
+    val transaction =
+        driver.session().beginTransaction(TransactionConfig.builder().withTimeout(Duration.ofMinutes(1)).build())
+    try
     {
-        return if (classificationProperties.isEmpty())
+        val firstNonValuedItemsetId =
+            relationship.valuedProperties
+                .fold(datasetId) { currentId, (property, value) ->
+                    transaction.getGroupingItemsetId(currentId, property, value) ?: run {
+                        transaction.classify(currentId, property)
+                        transaction.getGroupingItemsetId(currentId, property, value)
+                            ?: run {
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    "Value '$value' for property '$property' was invalid"
+                                )
+                                return
+                            }
+                    }
+                }
+
+        fun createTree(currentId: Int, classificationProperties: List<ClassificationProperty>): JsonElement
         {
-            val items = transaction.getContentsOfItemset(
-                currentId,
-                projection = relationship.groupedProperties.map { it.property }).distinct()
-            JsonArray(items.map { JsonObject(it.mapValues { (_, value) -> JsonPrimitive(value) }) })
-        }
-        else
-        {
-            val property = classificationProperties.first().property
-            val values = transaction.getValuesAndItemsets(currentId, property).ifEmpty {
-                transaction.classify(currentId, property)
-                transaction.getValuesAndItemsets(currentId, property)
+            return if (classificationProperties.isEmpty())
+            {
+                val items = transaction.getContentsOfItemset(
+                    currentId,
+                    projection = relationship.groupedProperties.map { it.property })
+                    .distinct()
+                    .sortedWith(propertyComparator(relationship.groupedProperties.map { it.property to it.sort }))
+                JsonArray(items.map { JsonObject(it.mapValues { (_, value) -> JsonPrimitive(value) }) })
             }
-            values.mapValues { (_, itemsetId) ->
-                createTree(itemsetId, classificationProperties.subList(1, classificationProperties.size))
-            }.let { JsonObject(it) }
+            else
+            {
+                val (property, sort) = classificationProperties.first()
+                val values = transaction.getValuesAndItemsets(currentId, property).ifEmpty {
+                    transaction.classify(currentId, property)
+                    transaction.getValuesAndItemsets(currentId, property)
+                }
+                values.toSortedMap(sort.comparing(stringSelector = { it }, intSelector = { it.toIntOrNull() }))
+                    .mapValues { (_, itemsetId) ->
+                        createTree(itemsetId, classificationProperties.subList(1, classificationProperties.size))
+                    }
+                    .let { JsonObject(it) }
+            }
         }
+
+        val json = createTree(firstNonValuedItemsetId, relationship.classificationProperties)
+        call.respond(HttpStatusCode.OK, json)
+    }
+    finally
+    {
+        transaction.commit()
+    }
+}
+
+fun propertyComparator(properties: List<Pair<String, SortingOrder>>) =
+    Comparator<Map<String, String>> { object1, object2 ->
+        for ((property, sort) in properties)
+        {
+            val comparator: Comparator<Map<String, String>> =
+                sort.comparing(stringSelector = { it[property] }, intSelector = { it[property]?.toIntOrNull() })
+            val comparison = compareValuesBy(object1, object2, comparator) { it }
+            if (comparison != 0) return@Comparator comparison
+        }
+        return@Comparator 0
     }
 
-    val json = createTree(firstNonValuedItemsetId, relationship.classificationProperties)
-    transaction.commit()
-    call.respond(HttpStatusCode.OK, json)
+private inline fun <T> SortingOrder.comparing(
+    crossinline stringSelector: (T) -> Comparable<*>?,
+    crossinline intSelector: (T) -> Comparable<*>?
+) = when (this)
+{
+    SortingOrder.ASCENDING -> compareBy(stringSelector)
+    SortingOrder.DESCENDING -> compareByDescending(stringSelector)
+    SortingOrder.INCREASING -> compareBy(intSelector)
+    SortingOrder.DECREASING -> compareByDescending(intSelector)
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.addDataset(
@@ -118,7 +162,8 @@ suspend fun PipelineContext<Unit, ApplicationCall>.deleteDataset(
 )
 {
     val status = driver.session().writeTransaction { transaction ->
-        val datasetUser = transaction.getDatasetNode(datasetName)?.username ?: return@writeTransaction HttpStatusCode.NotFound
+        val datasetUser =
+            transaction.getDatasetNode(datasetName)?.username ?: return@writeTransaction HttpStatusCode.NotFound
 
         if (call.principal<UserIdPrincipal>()?.name != datasetUser)
             return@writeTransaction HttpStatusCode.Forbidden

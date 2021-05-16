@@ -6,9 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="906fa6d0-84bf-4f79-8462-df8e8a6f34f0" name="Default Changelist" comment="Polish interface, fix consistency">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/serverAccess.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/serverAccess.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/MainViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/MainViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/Models.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/Models.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/ServerAccess.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/backend/ServerAccess.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/DataScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/DataScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/DataViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/viewmodel/DataViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../server/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/Application.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/Application.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/DatabaseOperations.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/DatabaseOperations.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Neo4JDriver.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/kotlin/ro/halex/av/plugins/Neo4JDriver.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/src/main/resources/application.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../server/src/main/resources/application.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,6 +241,8 @@
       <workItem from="1620626344088" duration="206000" />
       <workItem from="1620661889378" duration="2360000" />
       <workItem from="1620712936532" duration="6000" />
+      <workItem from="1620894908926" duration="521000" />
+      <workItem from="1621090751382" duration="17000" />
     </task>
     <task id="LOCAL-00001" summary="Make CRUD operations work">
       <created>1618827432284</created>

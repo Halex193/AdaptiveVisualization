@@ -3,13 +3,22 @@ package ro.halex.av
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ValuedProperty(val property: String, val value: String, val sort: String = "incr")
+data class ValuedProperty(val property: String, val value: String)
 
 @Serializable
-data class ClassificationProperty(val property: String, val sort: String = "incr")
+data class ClassificationProperty(val property: String, val sort: SortingOrder = SortingOrder.ASCENDING)
 
 @Serializable
-data class GroupedProperty(val property: String, val sort: String = "incr")
+data class GroupedProperty(val property: String, val sort: SortingOrder = SortingOrder.ASCENDING)
+
+@Serializable
+enum class SortingOrder
+{
+    ASCENDING,
+    DESCENDING,
+    INCREASING,
+    DECREASING
+}
 
 @Serializable
 data class NestingRelationship(

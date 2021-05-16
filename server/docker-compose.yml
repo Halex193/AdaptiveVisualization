@@ -7,7 +7,7 @@ services:
     depends_on:
       - database
     environment:
-      DATABASE: database
+      DATABASE: "database"
   database:
     image: "neo4j:4.2.1"
     ports:
