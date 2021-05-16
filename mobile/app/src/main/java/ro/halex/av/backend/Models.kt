@@ -2,15 +2,74 @@ package ro.halex.av.backend
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import ro.halex.av.ui.screen.Module
+
+sealed class NestingElement
+{
+    abstract val elementProperty: String?
+    abstract val elementSort: SortingOrder
+
+    abstract fun copyWithSort(sort: SortingOrder): NestingElement
+}
+
+data class SimpleProperty(val property: String?, val sort: SortingOrder = SortingOrder.ASCENDING): NestingElement()
+{
+    override val elementProperty: String?
+        get() = property
+    override val elementSort: SortingOrder
+        get() = sort
+
+    override fun copyWithSort(sort: SortingOrder): NestingElement
+    {
+        return copy(sort = sort)
+    }
+}
 
 @Serializable
-data class ValuedProperty(val property: String, val value: String, val sort: String = "incr")
+data class ValuedProperty(val property: String, @Transient val sort: SortingOrder = SortingOrder.ASCENDING, val value: String) :  NestingElement()
+{
+    override val elementProperty: String
+        get() = property
+    override val elementSort: SortingOrder
+        get() = sort
+
+    override fun copyWithSort(sort: SortingOrder): NestingElement
+    {
+        return copy(sort = sort)
+    }
+}
 
 @Serializable
-data class ClassificationProperty(val property: String, val sort: String = "incr", @Transient val module: Int = 0)
+data class ClassificationProperty(
+    val property: String,
+    val sort: SortingOrder = SortingOrder.ASCENDING,
+    val module: Module = Module.MODULE1
+) :  NestingElement()
+{
+    override val elementProperty: String
+        get() = property
+    override val elementSort: SortingOrder
+        get() = sort
+
+    override fun copyWithSort(sort: SortingOrder): NestingElement
+    {
+        return copy(sort = sort)
+    }
+}
 
 @Serializable
-data class GroupedProperty(val property: String, val sort: String = "incr")
+data class GroupedProperty(val property: String, val sort: SortingOrder = SortingOrder.ASCENDING) :  NestingElement()
+{
+    override val elementProperty: String
+        get() = property
+    override val elementSort: SortingOrder
+        get() = sort
+
+    override fun copyWithSort(sort: SortingOrder): NestingElement
+    {
+        return copy(sort = sort)
+    }
+}
 
 @Serializable
 data class NestingRelationship(
@@ -18,6 +77,15 @@ data class NestingRelationship(
     val classificationProperties: List<ClassificationProperty>,
     val groupedProperties: List<GroupedProperty>
 )
+
+@Serializable
+enum class SortingOrder
+{
+    ASCENDING,
+    DESCENDING,
+    INCREASING,
+    DECREASING
+}
 
 @Serializable
 data class DatasetDTO(

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    kotlin("plugin.serialization") version "1.5.0"
+    kotlin("plugin.serialization") version "1.4.32"
 }
 apply {
     plugin("kotlin-android")
@@ -36,7 +36,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
     buildFeatures {
         compose = true

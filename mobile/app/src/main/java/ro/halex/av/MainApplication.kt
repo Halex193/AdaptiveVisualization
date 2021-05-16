@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import io.ktor.client.*
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import ro.halex.av.backend.*
 
@@ -18,16 +19,16 @@ class MainApplication : Application()
     )
     val datasetInfoDataStore: DataStore<DatasetDTO?> by dataStore(
         "datasetInfo",
-        createJsonSerializer(null)
+        createJsonSerializer(defaultValue = null)
     )
-    val datasetTreeDataStore: DataStore<JsonObject> by dataStore(
+    val datasetTreeDataStore: DataStore<JsonElement> by dataStore(
         "datasetTree",
-        createJsonSerializer(JsonObject(emptyMap()))
+        createJsonSerializer(defaultValue = JsonObject(emptyMap()))
     )
 
     val nestingRelationshipDataStore: DataStore<NestingRelationship?> by dataStore(
-        "datasetTree",
-        createJsonSerializer(null)
+        "nestingRelationship",
+        createJsonSerializer(defaultValue = null)
     )
 
     override fun onCreate()
