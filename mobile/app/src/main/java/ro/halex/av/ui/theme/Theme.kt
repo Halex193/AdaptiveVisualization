@@ -1,50 +1,31 @@
 package ro.halex.av.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val DarkColorPalette = darkColors(
-        primary = Purple200,
-        primaryVariant = Purple700,
-        secondary = Teal200
-)
-
-private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200,
-    onSurface = Color.White,
-
-        /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-
-    */
-)
-
 @Composable
-fun AdaptiveVisualizationTheme(darkTheme: Boolean = false/*isSystemInDarkTheme()*/, content: @Composable() () -> Unit)
+fun AdaptiveVisualizationTheme(themeColor: Color, content: @Composable() () -> Unit)
 {
-    val colors = if (darkTheme)
-    {
-        DarkColorPalette
-    }
-    else
-    {
-        LightColorPalette
-    }
+    val darkenPercentage = 0.8f
+    val secondary = Color(themeColor.red * darkenPercentage, themeColor.green * darkenPercentage, themeColor.blue * darkenPercentage)
+    val colors = lightColors(
+        primary = secondary,
+        primaryVariant = secondary,
+        secondary = themeColor,
+        background = themeColor,
+        onBackground = Color.White,
+        surface = Color.White,
+        onSurface = themeColor,
+        onPrimary = Color.White,
+        onSecondary = Color.White,
+    )
 
     MaterialTheme(
-            colors = colors,
-            typography = Typography,
-            shapes = Shapes,
-            content = content
+        colors = colors,
+        typography = Typography,
+        shapes = Shapes,
+        content = content
     )
 }

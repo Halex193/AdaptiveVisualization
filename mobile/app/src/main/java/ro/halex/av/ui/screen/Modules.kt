@@ -3,6 +3,7 @@ package ro.halex.av.ui.screen
 enum class Module
 {
     MODULE1,
-    MODULE2,
-    MODULE3
+    DropDown,
+    MODULE3,
+    MODULE4
 }

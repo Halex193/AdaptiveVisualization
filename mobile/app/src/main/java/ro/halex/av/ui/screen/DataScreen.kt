@@ -50,7 +50,7 @@ fun DataScreen(onBackPress: () -> Unit)
                         .clickable { expanded = true }
                         .background(
                             Color(
-                                selectedDataset?.color?.toLongOrNull(16) ?: 0xFFFFFFFF
+                                selectedDataset?.color?.toLongOrNull(16) ?: 0xFF000000
                             )
                         )
                         .padding(5.dp)

@@ -2,6 +2,7 @@ package ro.halex.av
 
 import android.app.Application
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStore
 import io.ktor.client.*
 import kotlinx.serialization.json.JsonElement
