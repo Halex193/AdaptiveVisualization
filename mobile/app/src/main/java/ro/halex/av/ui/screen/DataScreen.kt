@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ro.halex.av.backend.*
+import ro.halex.av.ui.screen.modules.Module
 import ro.halex.av.viewmodel.DataViewModel
 
 @Composable

@@ -3,6 +3,7 @@ package ro.halex.av.backend
 import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
@@ -18,6 +19,10 @@ fun createHttpClient(): HttpClient = HttpClient(CIO) {
 
     install(JsonFeature) {
         serializer = KotlinxSerializer()
+    }
+
+    install(HttpTimeout) {
+        requestTimeoutMillis = 60000
     }
 }
 

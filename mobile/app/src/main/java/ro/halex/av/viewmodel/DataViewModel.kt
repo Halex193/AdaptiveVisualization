@@ -1,6 +1,7 @@
 package ro.halex.av.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
+import ro.halex.av.APP_TAG
 import ro.halex.av.backend.*
 import ro.halex.av.backend.NestingElement.*
 

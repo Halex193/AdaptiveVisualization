@@ -17,7 +17,7 @@ fun AdaptiveVisualizationTheme(themeColor: Color, content: @Composable() () -> U
         background = themeColor,
         onBackground = Color.White,
         surface = Color.White,
-        onSurface = themeColor,
+        onSurface = Color.Black,
         onPrimary = Color.White,
         onSecondary = Color.White,
     )

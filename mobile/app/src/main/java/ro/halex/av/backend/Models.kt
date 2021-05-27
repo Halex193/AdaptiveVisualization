@@ -2,7 +2,7 @@ package ro.halex.av.backend
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import ro.halex.av.ui.screen.Module
+import ro.halex.av.ui.screen.modules.Module
 
 sealed class NestingElement
 {
@@ -43,7 +43,7 @@ data class ValuedProperty(val property: String, @Transient val sort: SortingOrde
 data class ClassificationProperty(
     val property: String,
     val sort: SortingOrder = SortingOrder.ASCENDING,
-    val module: Module = Module.MODULE1
+    val module: Module = Module.Separators
 ) :  NestingElement()
 {
     override val elementProperty: String

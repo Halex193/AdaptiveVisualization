@@ -33,7 +33,7 @@ fun DropdownButton(
                                     .width(10.dp)
                                     .height(10.dp)
                                     .background(
-                                        if (it == selectedItem) MaterialTheme.colors.onSurface
+                                        if (it == selectedItem) MaterialTheme.colors.background
                                         else MaterialTheme.colors.surface,
                                         CircleShape
                                     )

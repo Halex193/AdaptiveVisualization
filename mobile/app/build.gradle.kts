@@ -65,6 +65,9 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:${rootProject.extra["compose_version"]}")
 
+    //TODO This is a large dependency and should not be included directly. Pack only the icons you need as resources
+    implementation("androidx.compose.material:material-icons-extended:${rootProject.extra["compose_version"]}")
+
     implementation("io.ktor:ktor-client-core:1.5.4")
     implementation("io.ktor:ktor-client-cio:1.5.4")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")

@@ -2,13 +2,17 @@ package ro.halex.av.viewmodel
 
 import android.app.Application
 import android.util.Log
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import android.widget.Toast
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
+import ro.halex.av.APP_TAG
 import ro.halex.av.backend.ClassificationProperty
 import ro.halex.av.backend.NestingRelationship
-import ro.halex.av.ui.screen.Module
+import ro.halex.av.backend.ValuedProperty
+import ro.halex.av.backend.getDataset
+import ro.halex.av.ui.screen.modules.Module
 
 sealed class Node
 
@@ -25,32 +29,98 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
     val datasetInfo = datasetInfoDataStore.data
     private val nestingRelationship = nestingRelationshipDataStore.data
     private val datasetTree = datasetTreeDataStore.data
-    val valuedProperties = nestingRelationship.map { it?.valuedProperties }
-    val tree = nestingRelationship.combine(datasetTree) { nestingRelationShip, datasetTree ->
-        nestingRelationShip ?: return@combine null
 
-        fun convertTree(
-            tree: JsonElement,
-            classificationProperties: List<ClassificationProperty>
-        ): Node
-        {
-            if (tree is JsonArray)
+    val tree: Flow<Node?> =
+        nestingRelationship.combine(datasetTree) { nestingRelationShip, datasetTree ->
+            nestingRelationShip ?: return@combine null
+
+            fun convertTree(
+                tree: JsonElement,
+                classificationProperties: List<ClassificationProperty>
+            ): Node
             {
-                return LeafNode(tree.map { jsonElement ->
-                    jsonElement.jsonObject.mapValues { it.value.jsonPrimitive.content }
-                })
-            }
-            val classificationProperty = classificationProperties.first()
-            val children = tree.jsonObject.mapValues {
-                convertTree(
-                    it.value,
-                    classificationProperties.slice(1 until classificationProperties.size)
+                if (tree is JsonArray)
+                {
+                    return LeafNode(tree.map { jsonElement ->
+                        jsonElement.jsonObject.mapValuesTo(LinkedHashMap()) { it.value.jsonPrimitive.content }
+                    })
+                }
+                val classificationProperty = classificationProperties.first()
+                val children = tree.jsonObject.mapValuesTo(LinkedHashMap()) {
+                    convertTree(
+                        it.value,
+                        classificationProperties.slice(1 until classificationProperties.size)
+                    )
+                }
+                return InnerNode(
+                    classificationProperty.module,
+                    classificationProperty.property,
+                    children
                 )
             }
-            return InnerNode(classificationProperty.module, classificationProperty.property, children)
+            convertTree(datasetTree, nestingRelationShip.classificationProperties)
         }
-        convertTree(datasetTree, nestingRelationShip.classificationProperties)
-    }.onEach {
-        Log.i("MainViewModel", "Displaying: $it")
+
+    val helpTree: Flow<Node?> = nestingRelationship.map { relationship ->
+        relationship ?: return@map null
+
+        fun convertRelationship(classificationProperties: List<ClassificationProperty>): Node
+        {
+            val classificationProperty = classificationProperties.firstOrNull() ?: run {
+                val dummyItem = relationship.groupedProperties.associate { it.property to "•" }
+                return LeafNode(listOf(dummyItem, dummyItem))
+            }
+
+            val subTree =
+                convertRelationship(classificationProperties.slice(1 until classificationProperties.size))
+
+            val property = classificationProperty.property
+            return InnerNode(
+                classificationProperty.module,
+                property,
+                mapOf("$property 1" to subTree, "$property 2" to subTree)
+            )
+        }
+        convertRelationship(relationship.classificationProperties)
+    }
+
+    val valuedProperties: Flow<LeafNode?> =
+        nestingRelationship.map { relationship ->
+            relationship?.valuedProperties?.associate { it.property to it.value }
+                ?.let { LeafNode(listOf(it)) }
+        }
+
+    fun refresh()
+    {
+        viewModelScope.launch {
+            val datasetName = datasetInfo.first()?.name ?: return@launch
+            val connectionURL = connectionDataStore.data.first() ?: return@launch
+            val nestingRelationship = nestingRelationship.first() ?: return@launch
+
+            httpClient.getDataset(
+                connectionURL,
+                datasetName,
+                nestingRelationship
+            )
+                ?.let { newData ->
+                    datasetTreeDataStore.updateData {oldData ->
+                        if (newData == oldData)
+                            showToast("Data was not changed")
+                        else
+                            showToast("Data was updated")
+                        newData
+                    }
+                }
+                ?: run {
+                    showToast("Server connection error")
+                }
+
+        }
+    }
+
+    private fun showToast(message: String)
+    {
+        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT)
+            .show()
     }
 }
