@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Preparation of Bachelors Thesis/Bachelor Project/Adaptive-Visualizer/mobile/app/src/main/res/drawable/sort_asc.xml" value="0.39479166666666665" />
+        <entry key="..\:/Preparation of Bachelors Thesis/Bachelor Project/Adaptive-Visualizer/mobile/app/src/main/res/drawable/sort_decr.xml" value="0.39479166666666665" />
+        <entry key="..\:/Preparation of Bachelors Thesis/Bachelor Project/Adaptive-Visualizer/mobile/app/src/main/res/drawable/sort_desc.xml" value="0.39479166666666665" />
+        <entry key="..\:/Preparation of Bachelors Thesis/Bachelor Project/Adaptive-Visualizer/mobile/app/src/main/res/drawable/sort_incr.xml" value="0.39479166666666665" />
+      </map>
+    </option>
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />

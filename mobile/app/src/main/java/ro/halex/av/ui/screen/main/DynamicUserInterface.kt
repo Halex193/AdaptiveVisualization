@@ -1,7 +1,7 @@
-package ro.halex.av.ui.screen.modules
+package ro.halex.av.ui.screen.main
 
 import androidx.compose.runtime.Composable
-import ro.halex.av.ui.screen.modules.Module.*
+import ro.halex.av.ui.screen.main.Module.*
 import ro.halex.av.viewmodel.InnerNode
 import ro.halex.av.viewmodel.LeafNode
 import ro.halex.av.viewmodel.Node

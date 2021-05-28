@@ -15,118 +15,164 @@ import ro.halex.av.backend.NestingElement.*
 
 class DataViewModel(application: Application) : AbstractViewModel(application)
 {
-    val mutableConnectionURL = mutableStateOf("")
+    val mutableConnectionURL = mutableStateOf<String?>(null)
+    private val mutableDatasetsLoading = mutableStateOf(false)
     private val mutableDatasets = mutableStateOf<List<DatasetDTO>?>(null)
-    val message = mutableStateOf<String?>(null)
     private val mutableSelectedDataset = mutableStateOf<DatasetDTO?>(null)
-    val mutableNestingElementList = mutableStateListOf<NestingElement>()
 
+    val mutableValuedProperties = mutableStateListOf<ValuedProperty>()
+    val mutableClassificationProperties = mutableStateListOf<ClassificationProperty>()
+    val mutableGroupedProperties = mutableStateListOf<GroupedProperty>()
+
+    val datasetsLoading = mutableDatasetsLoading as State<Boolean>
     val datasets = mutableDatasets as State<List<DatasetDTO>?>
     val selectedDataset = mutableSelectedDataset as State<DatasetDTO?>
+
+    val nestingRelationship
+        get() = NestingRelationship(
+            mutableValuedProperties.toList(),
+            mutableClassificationProperties.toList(),
+            mutableGroupedProperties.toList()
+        )
+
+
+    private suspend fun testingData()
+    {
+        //TODO remove this, testing only
+        mutableConnectionURL.value = defaultConnectionURL
+        getDatasets()
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
+        mutableDatasetsLoading.value = true
+        resetDatasets()
+        httpClient.getDatasets(connectionURL)
+            ?.let {
+                mutableDatasets.value = it
+                mutableSelectedDataset.value = it.first()
+            }
+            ?: run { showToast("Could not connect to server") }
+        mutableDatasetsLoading.value = false
+    }
 
     init
     {
         viewModelScope.launch {
-            mutableConnectionURL.value = connectionDataStore.data.first() ?: ""
+            testingData()
+            /*mutableConnectionURL.value = connectionDataStore.data.first() ?: ""
             val datasetInfo = datasetInfoDataStore.data.first() ?: return@launch
             getDatasets()
             mutableSelectedDataset.value = datasetInfo
             val relationship = nestingRelationshipDataStore.data.firstOrNull() ?: return@launch
             val elementList =
                 relationship.valuedProperties + relationship.classificationProperties + relationship.groupedProperties
-            mutableNestingElementList.addAll(elementList)
+            mutableNestingElementList.addAll(elementList)*/
         }
+    }
+
+    fun resetDatasets()
+    {
+        resetNestingRelationShip()
+        mutableDatasets.value = null
+        mutableSelectedDataset.value = null
+    }
+
+    private fun resetNestingRelationShip()
+    {
+        mutableValuedProperties.clear()
+        mutableClassificationProperties.clear()
+        mutableGroupedProperties.clear()
     }
 
     fun getDatasets()
     {
-        viewModelScope.launch {
-            val connectionURL = mutableConnectionURL.value
-            val datasets = httpClient.getDatasets(connectionURL) ?: run {
-                message.value = "Could not connect to server"
-                return@launch
-            }
-            mutableDatasets.value = datasets
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
+        mutableDatasetsLoading.value = true
+        resetDatasets()
+
+        viewModelScope.launch()
+        {
+            httpClient.getDatasets(connectionURL)
+                ?.let { mutableDatasets.value = it }
+                ?: run { showToast("Could not connect to server") }
+            mutableDatasetsLoading.value = false
         }
     }
 
     fun selectDataset(dataset: DatasetDTO)
     {
+        resetNestingRelationShip()
         mutableSelectedDataset.value = dataset
-        mutableNestingElementList.clear()
     }
 
-    fun addNestingElement()
+    fun getAvailableProperties(): List<String>
     {
-        mutableNestingElementList.add(SimpleProperty(null))
+        val dataset = requireNotNull(mutableSelectedDataset.value)
+        val existingProperties = setOf<List<NestingElement>>(
+            mutableValuedProperties,
+            mutableClassificationProperties,
+            mutableGroupedProperties
+        ).flatMap { it.map { nestingElement -> nestingElement.elementProperty } }.toMutableSet()
+
+        return dataset.properties - existingProperties
     }
 
-    fun removeNestingElement(index: Int)
+    suspend fun getAvailableValues(property: String, sort: SortingOrder): List<String>
     {
-        mutableNestingElementList.removeAt(index)
-    }
+        val dataset = requireNotNull(mutableSelectedDataset.value)
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
 
-    fun getAvailableProperties(nestingElement: NestingElement): List<String>
-    {
-        val dataset = mutableSelectedDataset.value ?: error("Dataset not selected")
-        return dataset.properties - mutableNestingElementList.mapNotNull { it.elementProperty }
-            .filterNot { it == nestingElement.elementProperty }
-    }
-
-    suspend fun getAvailableValues(index: Int): List<String>?
-    {
-        val dataset = mutableSelectedDataset.value ?: error("Dataset not selected")
-        val valuedProperties = mutableNestingElementList.subList(0, index)
-            .filterIsInstance<ValuedProperty>()
-        val currentElement = mutableNestingElementList[index]
-        val property = currentElement.elementProperty ?: error("Property was not chosen")
         val groupedProperties = listOf(
             GroupedProperty(
                 property,
-                currentElement.elementSort
+                sort
             )
         )
         val nestingRelationship =
-            NestingRelationship(valuedProperties, emptyList(), groupedProperties)
+            NestingRelationship(mutableValuedProperties.toList(), emptyList(), groupedProperties)
 
         val jsonArray = httpClient.getDataset(
-            mutableConnectionURL.value,
+            connectionURL,
             dataset.name,
             nestingRelationship
-        )?.jsonArray ?: return null
-        return jsonArray.asSequence()
-            .mapNotNull { it.jsonObject[property]?.jsonPrimitive?.contentOrNull }.toList()
+        )?.jsonArray ?: run {
+            resetDatasets()
+            return emptyList()
+        }
+        return jsonArray
+            .asSequence()
+            .mapNotNull { it.jsonObject[property]?.jsonPrimitive?.contentOrNull }
+            .toList()
     }
 
     fun save(onSaveFinished: () -> Unit)
     {
-        val dataset = mutableSelectedDataset.value ?: error("Dataset not selected")
+        val dataset = requireNotNull(mutableSelectedDataset.value)
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
+
         viewModelScope.launch {
-            connectionDataStore.updateData { mutableConnectionURL.value }
+            connectionDataStore.updateData { connectionURL }
             datasetInfoDataStore.updateData { dataset }
-            val elementList = mutableNestingElementList
-            val valuedProperties = elementList.filterIsInstance<ValuedProperty>()
-            val classificationProperties = elementList.filterIsInstance<ClassificationProperty>()
-            val groupedProperties = elementList.filterIsInstance<GroupedProperty>()
-            val nestingRelationship =
-                NestingRelationship(valuedProperties, classificationProperties, groupedProperties)
+            val currentNestingRelationship = nestingRelationship
             datasetTreeDataStore.updateData {
                 httpClient.getDataset(
-                    mutableConnectionURL.value,
+                    connectionURL,
                     dataset.name,
-                    nestingRelationship
+                    currentNestingRelationship
                 ) ?: error("Response was not a json element")
             }
-            nestingRelationshipDataStore.updateData { nestingRelationship }
+            nestingRelationshipDataStore.updateData { currentNestingRelationship }
             onSaveFinished()
         }
     }
 
-    fun fill()
+    fun addValuedProperty(property: String, value: String)
     {
-        val dataset = mutableSelectedDataset.value ?: error("Dataset not selected")
-        val remainingProperties =
-            dataset.properties - mutableNestingElementList.mapNotNull { it.elementProperty }
-        mutableNestingElementList.addAll(remainingProperties.map { GroupedProperty(it) })
+        if (mutableValuedProperties.any { it.property == property })
+            error("Value added for existing valued property")
+        mutableValuedProperties.add(ValuedProperty(property = property, value = value))
+    }
+
+    fun deleteValuedProperty(valuedProperty: ValuedProperty)
+    {
+        mutableValuedProperties.remove(valuedProperty)
     }
 }

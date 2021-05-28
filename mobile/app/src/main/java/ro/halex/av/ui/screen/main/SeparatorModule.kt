@@ -1,4 +1,4 @@
-package ro.halex.av.ui.screen.modules
+package ro.halex.av.ui.screen.main
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi

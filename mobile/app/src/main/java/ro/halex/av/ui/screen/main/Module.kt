@@ -1,4 +1,4 @@
-package ro.halex.av.ui.screen.modules
+package ro.halex.av.ui.screen.main
 
 enum class Module
 {

@@ -1,6 +1,7 @@
 package ro.halex.av.viewmodel
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import ro.halex.av.MainApplication
 
@@ -12,4 +13,10 @@ abstract class AbstractViewModel(application: Application) : AndroidViewModel(ap
     protected val datasetInfoDataStore = mainApplication.datasetInfoDataStore
     protected val datasetTreeDataStore = mainApplication.datasetTreeDataStore
     protected val nestingRelationshipDataStore = mainApplication.nestingRelationshipDataStore
+
+    protected fun showToast(message: String)
+    {
+        Toast.makeText(mainApplication, message, Toast.LENGTH_SHORT)
+            .show()
+    }
 }

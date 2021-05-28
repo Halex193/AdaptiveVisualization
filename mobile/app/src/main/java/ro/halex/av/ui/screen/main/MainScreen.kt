@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import ro.halex.av.ui.screen.modules.*
+import ro.halex.av.ui.screen.main.*
 import ro.halex.av.ui.theme.AdaptiveVisualizationTheme
 import ro.halex.av.viewmodel.MainViewModel
 

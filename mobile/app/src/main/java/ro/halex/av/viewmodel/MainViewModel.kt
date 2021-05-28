@@ -1,18 +1,13 @@
 package ro.halex.av.viewmodel
 
 import android.app.Application
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
-import ro.halex.av.APP_TAG
 import ro.halex.av.backend.ClassificationProperty
-import ro.halex.av.backend.NestingRelationship
-import ro.halex.av.backend.ValuedProperty
 import ro.halex.av.backend.getDataset
-import ro.halex.av.ui.screen.modules.Module
+import ro.halex.av.ui.screen.main.Module
 
 sealed class Node
 
@@ -116,11 +111,5 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
                 }
 
         }
-    }
-
-    private fun showToast(message: String)
-    {
-        Toast.makeText(getApplication(), message, Toast.LENGTH_SHORT)
-            .show()
     }
 }

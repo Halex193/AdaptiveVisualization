@@ -5,15 +5,22 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+fun Color.blend(modifier: Float): Color
+{
+    return Color(this.red * modifier, this.green * modifier, this.blue * modifier)
+}
+
 @Composable
 fun AdaptiveVisualizationTheme(themeColor: Color, content: @Composable() () -> Unit)
 {
-    val darkenPercentage = 0.8f
-    val secondary = Color(themeColor.red * darkenPercentage, themeColor.green * darkenPercentage, themeColor.blue * darkenPercentage)
+    val primary = themeColor.blend(0.8f)
+    val primaryVariant = themeColor.blend(0.6f)
+    val secondary = themeColor.blend(0.2f)
+
     val colors = lightColors(
-        primary = secondary,
-        primaryVariant = secondary,
-        secondary = themeColor,
+        primary = primary,
+        primaryVariant = primaryVariant,
+        secondary = secondary,
         background = themeColor,
         onBackground = Color.White,
         surface = Color.White,
