@@ -39,6 +39,16 @@ fun ValuedPropertiesTab()
 
                 val (expanded, onExpandChange) = remember { mutableStateOf(false) }
 
+                SortingOrderPicker(sortingOrder, onSortingOrderChange = { sortingOrder ->
+                    onSortingOrderChange(sortingOrder)
+                    property?.let { property ->
+                        values = null
+                        coroutineScope.launch {
+                            values = viewModel.getAvailableValues(property, sortingOrder)
+                        }
+                    }
+                })
+
                 PropertyDropdownButton(
                     Modifier.padding(10.dp),
                     property = property,
@@ -50,16 +60,6 @@ fun ValuedPropertiesTab()
                             onExpandChange(true)
                         }
                     })
-                SortingOrderPicker(sortingOrder, onSortingOrderChange = { sortingOrder ->
-                    onSortingOrderChange(sortingOrder)
-                    property?.let { property ->
-                        values = null
-                        coroutineScope.launch {
-                            values = viewModel.getAvailableValues(property, sortingOrder)
-                            onExpandChange(true)
-                        }
-                    }
-                })
 
                 ValueDropDownButton(
                     Modifier.padding(10.dp),

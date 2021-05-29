@@ -30,7 +30,7 @@ data class ValuedProperty(val property: String, @Transient val sort: SortingOrde
 data class ClassificationProperty(
     val property: String,
     val sort: SortingOrder = SortingOrder.ASCENDING,
-    val module: Module = Module.Separators
+    val module: Module = Module.SEPARATORS
 ) :  NestingElement()
 {
     override val elementProperty: String

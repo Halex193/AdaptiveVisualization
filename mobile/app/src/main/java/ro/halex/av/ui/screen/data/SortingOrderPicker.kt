@@ -19,19 +19,20 @@ import androidx.compose.ui.unit.dp
 import ro.halex.av.R
 import ro.halex.av.backend.SortingOrder
 
+internal val icons = linkedMapOf(
+    SortingOrder.ASCENDING to R.drawable.sort_asc,
+    SortingOrder.DESCENDING to R.drawable.sort_desc,
+    SortingOrder.INCREASING to R.drawable.sort_incr,
+    SortingOrder.DECREASING to R.drawable.sort_decr
+)
+
 @Composable
-fun SortingOrderPicker(sortingOrder: SortingOrder, onSortingOrderChange: (SortingOrder) -> Unit)
+internal fun SortingOrderPicker(sortingOrder: SortingOrder, onSortingOrderChange: (SortingOrder) -> Unit)
 {
     Row {
-        val icons = listOf(
-            SortingOrder.ASCENDING to R.drawable.sort_asc,
-            SortingOrder.DESCENDING to R.drawable.sort_desc,
-            SortingOrder.INCREASING to R.drawable.sort_incr,
-            SortingOrder.DECREASING to R.drawable.sort_decr
-        )
         for ((sort, icon) in icons)
         {
-            IconButton(modifier = Modifier.padding(5.dp).size(35.dp).clip(CircleShape), onClick = { onSortingOrderChange(sort) }) {
+            IconButton(modifier = Modifier.padding(5.dp).size(35.dp).clip(CircleShape), onClick = { if (sort != sortingOrder) onSortingOrderChange(sort) }) {
                 val transition = updateTransition(
                     targetState = sortingOrder == sort,
                     label = "Color change transition"

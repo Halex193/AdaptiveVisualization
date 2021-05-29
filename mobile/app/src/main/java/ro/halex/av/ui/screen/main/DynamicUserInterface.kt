@@ -15,10 +15,10 @@ fun DynamicUserInterface(node: Node)
         {
             when (node.module)
             {
-                Separators -> SeparatorModule(node)
-                DropDown -> DropDownModule(node)
-                Boxes -> BoxModule(node)
-                Tabs -> TabModule(node)
+                SEPARATORS -> SeparatorModule(node)
+                DROPDOWN -> DropDownModule(node)
+                BOXES -> BoxModule(node)
+                TABS -> TabModule(node)
             }
         }
         is LeafNode -> GroupingModule(node)

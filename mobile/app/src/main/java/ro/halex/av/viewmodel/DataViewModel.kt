@@ -12,6 +12,7 @@ import kotlinx.serialization.json.*
 import ro.halex.av.APP_TAG
 import ro.halex.av.backend.*
 import ro.halex.av.backend.NestingElement.*
+import ro.halex.av.ui.screen.main.Module
 
 class DataViewModel(application: Application) : AbstractViewModel(application)
 {
@@ -174,5 +175,39 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     fun deleteValuedProperty(valuedProperty: ValuedProperty)
     {
         mutableValuedProperties.remove(valuedProperty)
+    }
+
+    fun addClassificationProperty(property: String, module: Module, sortingOrder: SortingOrder)
+    {
+        if (mutableClassificationProperties.any { it.property == property })
+            error("Value added for existing classification property")
+        mutableClassificationProperties.add(ClassificationProperty(property, sortingOrder, module))
+    }
+
+    fun deleteClassificationProperty(classificationProperty: ClassificationProperty)
+    {
+        mutableClassificationProperties.remove(classificationProperty)
+    }
+
+    fun canPushUpDown(classificationProperty: ClassificationProperty): Pair<Boolean, Boolean>
+    {
+        val index = mutableClassificationProperties.indexOf(classificationProperty)
+        val size = mutableClassificationProperties.size
+
+        return (index >= 1) to (index < size - 1)
+    }
+
+    fun pushUp(classificationProperty: ClassificationProperty)
+    {
+        val index = mutableClassificationProperties.indexOf(classificationProperty)
+        mutableClassificationProperties[index] = mutableClassificationProperties[index - 1]
+        mutableClassificationProperties[index - 1] = classificationProperty
+    }
+
+    fun pushDown(classificationProperty: ClassificationProperty)
+    {
+        val index = mutableClassificationProperties.indexOf(classificationProperty)
+        mutableClassificationProperties[index] = mutableClassificationProperties[index + 1]
+        mutableClassificationProperties[index + 1] = classificationProperty
     }
 }

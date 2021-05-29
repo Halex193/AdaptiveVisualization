@@ -1,9 +1,9 @@
 package ro.halex.av.ui.screen.main
 
-enum class Module
+enum class Module(val label: String)
 {
-    Separators,
-    DropDown,
-    Boxes,
-    Tabs
+    SEPARATORS("Separators"),
+    DROPDOWN("Drop-Down"),
+    BOXES("Boxes"),
+    TABS("Tabs")
 }
