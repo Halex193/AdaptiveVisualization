@@ -2,6 +2,7 @@ package ro.halex.av.ui.screen.data
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.*
@@ -20,20 +21,20 @@ fun DataScreen(onBackPress: () -> Unit)
 {
     val viewModel = viewModel<DataViewModel>()
     val selectedDataset = viewModel.selectedDataset.value
-    val color = selectedDataset?.color?.let { Color(it.toLong(16)) } ?: Color.DarkGray
+    val color by animateColorAsState(selectedDataset?.color
+                                         ?.let { Color(it.toLong(16)) }
+                                         ?: Color.DarkGray)
     AdaptiveVisualizationTheme(themeColor = color) {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             Column(Modifier.fillMaxSize()) {
                 Header(onBackPress)
-                if (viewModel.mutableConnectionURL.value != null)
-                {
-                    ConnectionRow()
-                    val datasets = viewModel.datasets.value
-                    AnimatedVisibility(visible = datasets != null) {
-                        DatasetSelection()
-                    }
-                    RelationshipConfiguration(onBackPress)
+                ConnectionRow()
+                val datasets = viewModel.datasets.value
+                val datasetsLoading = viewModel.datasetsLoading.value
+                AnimatedVisibility(visible = datasets != null && !datasetsLoading) {
+                    DatasetSelection()
                 }
+                RelationshipConfiguration(onBackPress)
             }
         }
     }

@@ -1,9 +1,6 @@
 package ro.halex.av.ui.screen.data
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -62,11 +59,14 @@ fun PreviewTab(onBackPress: () -> Unit)
         }
     } else
     {
-        Text(
-            "Choose properties to show preview",
-            style = MaterialTheme.typography.h6,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(10.dp)
-        )
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center)
+        {
+            Text(
+                "Choose properties to show preview",
+                style = MaterialTheme.typography.h6,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
     }
 }

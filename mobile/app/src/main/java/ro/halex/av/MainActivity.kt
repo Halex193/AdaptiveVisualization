@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity()
         super.onCreate(savedInstanceState)
         setContent {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "data") {
+                NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainScreen(onDataPress = { navController.navigate("data") }) }
                     composable("data") { DataScreen(onBackPress = { navController.navigateUp() }) }
                 }

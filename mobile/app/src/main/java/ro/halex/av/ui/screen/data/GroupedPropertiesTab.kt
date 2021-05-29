@@ -44,7 +44,7 @@ fun GroupedPropertiesTab()
                     onPropertySelect = { property ->
                         viewModel.addGroupedProperty(property, sortingOrder)
                     })
-                if (viewModel.getAvailableProperties().isNotEmpty())
+                if (viewModel.availableProperties.isNotEmpty())
                 {
                     Button(
                         onClick = { viewModel.fillGroupedProperties(sortingOrder) },

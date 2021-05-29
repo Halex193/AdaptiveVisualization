@@ -1,19 +1,23 @@
 package ro.halex.av.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
+import ro.halex.av.APP_TAG
 import ro.halex.av.backend.*
 import ro.halex.av.ui.screen.main.Module
 
 class DataViewModel(application: Application) : AbstractViewModel(application)
 {
-    val mutableConnectionURL = mutableStateOf<String?>(null)
+    val mutableConnectionURL = mutableStateOf(defaultConnectionURL)
     private val mutableDatasetsLoading = mutableStateOf(false)
     private val mutableDatasets = mutableStateOf<List<DatasetDTO>?>(null)
     private val mutableSelectedDataset = mutableStateOf<DatasetDTO?>(null)
@@ -24,6 +28,19 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     val datasetsLoading = mutableDatasetsLoading as State<Boolean>
     val datasets = mutableDatasets as State<List<DatasetDTO>?>
     val selectedDataset = mutableSelectedDataset as State<DatasetDTO?>
+
+    val availableProperties: List<String>
+        get()
+        {
+            val dataset = requireNotNull(mutableSelectedDataset.value)
+            val existingProperties = setOf<List<NestingElement>>(
+                mutableValuedProperties,
+                mutableClassificationProperties,
+                mutableGroupedProperties
+            ).flatMap { it.map { nestingElement -> nestingElement.elementProperty } }.toMutableSet()
+
+            return dataset.properties - existingProperties
+        }
 
     val nestingRelationshipEmpty: Boolean
         get() = nestingRelationship.let {
@@ -44,36 +61,42 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
             mutableGroupedProperties.toList()
         )
 
-
-    private suspend fun testingData()
-    {
-        //TODO remove this, testing only
-        mutableConnectionURL.value = defaultConnectionURL
-        getDatasets()
-        val connectionURL = requireNotNull(mutableConnectionURL.value)
-        mutableDatasetsLoading.value = true
-        resetDatasets()
-        httpClient.getDatasets(connectionURL)
-            ?.let {
-                mutableDatasets.value = it
-                mutableSelectedDataset.value = it.first()
-            }
-            ?: run { showToast("Could not connect to server") }
-        mutableDatasetsLoading.value = false
-    }
-
     init
     {
         viewModelScope.launch {
-            testingData()
-            /*mutableConnectionURL.value = connectionDataStore.data.first() ?: ""
-            val datasetInfo = datasetInfoDataStore.data.first() ?: return@launch
-            getDatasets()
-            mutableSelectedDataset.value = datasetInfo
-            val relationship = nestingRelationshipDataStore.data.firstOrNull() ?: return@launch
-            val elementList =
-                relationship.valuedProperties + relationship.classificationProperties + relationship.groupedProperties
-            mutableNestingElementList.addAll(elementList)*/
+            resetNestingRelationShip()
+            nestingRelationshipDataStore.data.firstOrNull()?.apply {
+                mutableValuedProperties.addAll(valuedProperties)
+                mutableClassificationProperties.addAll(classificationProperties)
+                mutableGroupedProperties.addAll(groupedProperties)
+            } ?: return@launch
+
+            mutableDatasetsLoading.value = true
+            val connectionURL =
+                connectionDataStore.data.first().also { mutableConnectionURL.value = it }
+
+            httpClient.getDatasets(connectionURL).also { datasets ->
+                if (datasets == null)
+                {
+                    showToast("Could not connect to server")
+                }
+                else
+                {
+                    mutableDatasets.value = datasets
+
+                    datasetInfoDataStore.data.first()?.let {
+                        if (it in datasets)
+                        {
+                            mutableSelectedDataset.value = it
+                        } else
+                        {
+                            showToast("Dataset was deleted")
+                        }
+                    }
+                }
+            }
+
+            mutableDatasetsLoading.value = false
         }
     }
 
@@ -112,18 +135,6 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
         mutableSelectedDataset.value = dataset
     }
 
-    fun getAvailableProperties(): List<String>
-    {
-        val dataset = requireNotNull(mutableSelectedDataset.value)
-        val existingProperties = setOf<List<NestingElement>>(
-            mutableValuedProperties,
-            mutableClassificationProperties,
-            mutableGroupedProperties
-        ).flatMap { it.map { nestingElement -> nestingElement.elementProperty } }.toMutableSet()
-
-        return dataset.properties - existingProperties
-    }
-
     suspend fun getAvailableValues(property: String, sort: SortingOrder): List<String>
     {
         val dataset = requireNotNull(mutableSelectedDataset.value)
@@ -152,20 +163,6 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
             .toList()
     }
 
-    fun save(data: JsonElement, onSaveFinished: () -> Unit)
-    {
-        val dataset = requireNotNull(mutableSelectedDataset.value)
-        val connectionURL = requireNotNull(mutableConnectionURL.value)
-
-        viewModelScope.launch {
-            connectionDataStore.updateData { connectionURL }
-            datasetInfoDataStore.updateData { dataset }
-            datasetTreeDataStore.updateData { data }
-            nestingRelationshipDataStore.updateData { nestingRelationship }
-            onSaveFinished()
-        }
-    }
-
     suspend fun getData(): JsonElement?
     {
         val dataset = requireNotNull(mutableSelectedDataset.value)
@@ -178,6 +175,20 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
             showToast("Server connection failed")
             resetDatasets()
             null
+        }
+    }
+
+    fun save(data: JsonElement, onSaveFinished: () -> Unit)
+    {
+        val dataset = requireNotNull(mutableSelectedDataset.value)
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
+
+        viewModelScope.launch {
+            connectionDataStore.updateData { connectionURL }
+            datasetInfoDataStore.updateData { dataset }
+            datasetTreeDataStore.updateData { data }
+            nestingRelationshipDataStore.updateData { nestingRelationship }
+            onSaveFinished()
         }
     }
 
@@ -213,6 +224,8 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
 
     fun addGroupedProperty(property: String, sortingOrder: SortingOrder)
     {
+        if (mutableGroupedProperties.any { it.property == property })
+            error("Value added for existing grouped property")
         mutableGroupedProperties.add(GroupedProperty(property, sortingOrder))
     }
 
@@ -229,7 +242,7 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
 
     fun fillGroupedProperties(sortingOrder: SortingOrder)
     {
-        getAvailableProperties().forEach {
+        availableProperties.forEach {
             addGroupedProperty(it, sortingOrder)
         }
     }

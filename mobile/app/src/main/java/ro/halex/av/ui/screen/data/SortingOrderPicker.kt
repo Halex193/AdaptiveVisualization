@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ro.halex.av.R
@@ -38,7 +39,7 @@ internal fun SortingOrderPicker(sortingOrder: SortingOrder, onSortingOrderChange
                     label = "Color change transition"
                 )
                 val backgroundColor by transition.animateColor(label = "Background color") {
-                    if (it) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary
+                    if (it) MaterialTheme.colors.onPrimary else Color.Transparent
                 }
                 val tintColor by transition.animateColor(label = "Tint color") {
                     if (it) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary

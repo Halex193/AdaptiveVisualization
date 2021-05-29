@@ -26,6 +26,9 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
     private val nestingRelationship = nestingRelationshipDataStore.data
     private val datasetTree = datasetTreeDataStore.data
 
+    val nestingRelationshipEmpty: Flow<Boolean> =
+        nestingRelationship.take(1).map { it == null }
+
     val tree: Flow<Node?> =
         nestingRelationship.combine(datasetTree) { nestingRelationShip, datasetTree ->
             nestingRelationShip ?: return@combine null
@@ -72,7 +75,7 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
     {
         viewModelScope.launch {
             val datasetName = datasetInfo.first()?.name ?: return@launch
-            val connectionURL = connectionDataStore.data.first() ?: return@launch
+            val connectionURL = connectionDataStore.data.first()
             val nestingRelationship = nestingRelationship.first() ?: return@launch
 
             httpClient.getDataset(
@@ -81,7 +84,7 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
                 nestingRelationship
             )
                 ?.let { newData ->
-                    datasetTreeDataStore.updateData {oldData ->
+                    datasetTreeDataStore.updateData { oldData ->
                         if (newData == oldData)
                             showToast("Data was not changed")
                         else

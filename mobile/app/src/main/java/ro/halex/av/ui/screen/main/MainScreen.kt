@@ -91,7 +91,25 @@ fun MainScreen(onDataPress: () -> Unit)
                                     DynamicUserInterface(tree)
                                 }
                                     ?: run {
-                                        Text("Go to the settings menu and set up a dataset", Modifier.padding(20.dp).fillMaxSize(), textAlign = TextAlign.Center)
+                                        Box(Modifier.fillMaxSize())
+                                        {
+                                            val nestingRelationshipEmpty =
+                                                viewModel.nestingRelationshipEmpty.collectAsState(
+                                                    false
+                                                ).value
+                                            if (nestingRelationshipEmpty)
+                                            {
+                                                Text(
+                                                    "Go to the settings menu and set up a dataset",
+                                                    Modifier
+                                                        .padding(20.dp)
+                                                        .fillMaxSize(), textAlign = TextAlign.Center
+                                                )
+                                            } else
+                                            {
+                                                CircularProgressIndicator()
+                                            }
+                                        }
                                     }
                             }
                         }

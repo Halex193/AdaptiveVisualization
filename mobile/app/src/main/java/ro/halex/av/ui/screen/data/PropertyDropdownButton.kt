@@ -1,15 +1,11 @@
 package ro.halex.av.ui.screen.data
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ro.halex.av.viewmodel.DataViewModel
 
@@ -22,15 +18,18 @@ internal fun PropertyDropdownButton(
 {
     val viewModel: DataViewModel = viewModel()
     var expanded by remember { mutableStateOf(false) }
-    var properties by remember { mutableStateOf(emptyList<String>()) }
+    val properties  = viewModel.availableProperties
     Box(modifier) {
         Button(
             onClick = {
-                properties = viewModel.getAvailableProperties()
                 expanded = true
-            }, colors = backgroundButtonColors()
+            },
+            colors = backgroundButtonColors(),
+            enabled = properties.isNotEmpty()
         ) {
-            Text(property ?: "Choose property")
+            val unselectedText =
+                if (properties.isEmpty()) "No properties left" else "Choose property"
+            Text(property ?: unselectedText)
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             Column {

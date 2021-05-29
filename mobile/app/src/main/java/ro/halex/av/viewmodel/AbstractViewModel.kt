@@ -27,7 +27,7 @@ abstract class AbstractViewModel(application: Application) : AndroidViewModel(ap
         fun convertRelationship(classificationProperties: List<ClassificationProperty>): Node
         {
             val classificationProperty = classificationProperties.firstOrNull() ?: run {
-                val dummyItem = relationship.groupedProperties.associate { it.property to "•" }
+                val dummyItem = relationship.groupedProperties.associate { it.property to "value"/*"•"*/ }
                 return LeafNode(listOf(dummyItem, dummyItem))
             }
 

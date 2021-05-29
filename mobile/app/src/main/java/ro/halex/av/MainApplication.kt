@@ -14,7 +14,7 @@ const val APP_TAG = "AdaptiveVisualizationApplication"
 class MainApplication : Application()
 {
     lateinit var httpClient: HttpClient
-    val connectionDataStore: DataStore<String?> by dataStore(
+    val connectionDataStore: DataStore<String> by dataStore(
         "connection",
         createJsonSerializer(defaultConnectionURL)
     )
