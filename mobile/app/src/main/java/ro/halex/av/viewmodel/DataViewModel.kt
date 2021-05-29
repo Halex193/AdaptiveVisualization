@@ -1,17 +1,14 @@
 package ro.halex.av.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
-import ro.halex.av.APP_TAG
 import ro.halex.av.backend.*
-import ro.halex.av.backend.NestingElement.*
 import ro.halex.av.ui.screen.main.Module
 
 class DataViewModel(application: Application) : AbstractViewModel(application)
@@ -189,25 +186,53 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
         mutableClassificationProperties.remove(classificationProperty)
     }
 
-    fun canPushUpDown(classificationProperty: ClassificationProperty): Pair<Boolean, Boolean>
+    fun canPushUpDown(classificationProperty: ClassificationProperty): Pair<Boolean, Boolean> =
+        mutableClassificationProperties.canPushUpDown(classificationProperty)
+
+    fun pushUp(classificationProperty: ClassificationProperty) =
+        mutableClassificationProperties.pushUp(classificationProperty)
+
+    fun pushDown(classificationProperty: ClassificationProperty) =
+        mutableClassificationProperties.pushDown(classificationProperty)
+
+    fun addGroupedProperty(property: String, sortingOrder: SortingOrder)
     {
-        val index = mutableClassificationProperties.indexOf(classificationProperty)
-        val size = mutableClassificationProperties.size
+        mutableGroupedProperties.add(GroupedProperty(property, sortingOrder))
+    }
+
+    fun deleteGroupedProperty(groupedProperty: GroupedProperty)
+    {
+        mutableGroupedProperties.remove(groupedProperty)
+    }
+
+    fun canPushUpDown(groupedProperty: GroupedProperty): Pair<Boolean, Boolean> =
+        mutableGroupedProperties.canPushUpDown(groupedProperty)
+
+    fun pushUp(groupedProperty: GroupedProperty) =
+        mutableGroupedProperties.pushUp(groupedProperty)
+
+    fun pushDown(groupedProperty: GroupedProperty) =
+        mutableGroupedProperties.pushDown(groupedProperty)
+
+    private fun <T : NestingElement> SnapshotStateList<T>.canPushUpDown(property: T): Pair<Boolean, Boolean>
+    {
+        val index = this.indexOf(property)
+        val size = this.size
 
         return (index >= 1) to (index < size - 1)
     }
 
-    fun pushUp(classificationProperty: ClassificationProperty)
+    private fun <T : NestingElement> SnapshotStateList<T>.pushUp(property: T)
     {
-        val index = mutableClassificationProperties.indexOf(classificationProperty)
-        mutableClassificationProperties[index] = mutableClassificationProperties[index - 1]
-        mutableClassificationProperties[index - 1] = classificationProperty
+        val index = this.indexOf(property)
+        this[index] = this[index - 1]
+        this[index - 1] = property
     }
 
-    fun pushDown(classificationProperty: ClassificationProperty)
+    private fun <T : NestingElement> SnapshotStateList<T>.pushDown(property: T)
     {
-        val index = mutableClassificationProperties.indexOf(classificationProperty)
-        mutableClassificationProperties[index] = mutableClassificationProperties[index + 1]
-        mutableClassificationProperties[index + 1] = classificationProperty
+        val index = this.indexOf(property)
+        this[index] = this[index + 1]
+        this[index + 1] = property
     }
 }
