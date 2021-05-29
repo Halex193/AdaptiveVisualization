@@ -76,7 +76,15 @@ fun MainScreen(onDataPress: () -> Unit)
                         Crossfade(showHelp) {
                             if (it)
                             {
-                                HelpCard(viewModel)
+                                run block@{
+                                    val valuedProperties =
+                                        viewModel.valuedProperties.collectAsState(null).value
+                                            ?: return@block
+                                    val helpTree = viewModel.helpTree.collectAsState(null).value
+                                        ?: return@block
+
+                                    HelpCard(valuedProperties, helpTree)
+                                }
                             } else
                             {
                                 viewModel.tree.collectAsState(initial = null).value?.let { tree ->
@@ -87,32 +95,6 @@ fun MainScreen(onDataPress: () -> Unit)
                                     }
                             }
                         }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun HelpCard(viewModel: MainViewModel)
-{
-    Card {
-        run block@{
-            val valuedProperties = viewModel.valuedProperties.collectAsState(null).value
-                ?: return@block
-            val helpTree = viewModel.helpTree.collectAsState(null).value ?: return@block
-            AdaptiveVisualizationTheme(themeColor = Color.DarkGray) {
-                Surface(
-                    Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Column(Modifier.padding(10.dp)) {
-                        if (valuedProperties.data.first().isNotEmpty())
-                        {
-                            GroupingModule(node = valuedProperties)
-                        }
-                        DynamicUserInterface(helpTree)
                     }
                 }
             }

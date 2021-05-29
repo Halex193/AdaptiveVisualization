@@ -9,12 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ro.halex.av.viewmodel.DataViewModel
 
 @Composable
-fun RelationshipConfiguration()
+fun RelationshipConfiguration(onBackPress:() -> Unit)
 {
     viewModel<DataViewModel>().selectedDataset.value ?: return
 
@@ -33,8 +34,16 @@ fun RelationshipConfiguration()
                 Tab.VALUED -> ValuedPropertiesTab()
                 Tab.CLASSIFICATION -> ClassificationPropertiesTab()
                 Tab.GROUPED -> GroupedPropertiesTab()
-                Tab.PREVIEW -> PreviewTab()
+                Tab.PREVIEW -> PreviewTab(onBackPress)
             }
         }
     }
 }
+
+@Composable
+internal fun backgroundButtonColors() =
+    ButtonDefaults.textButtonColors(
+        backgroundColor = MaterialTheme.colors.background,
+        contentColor = MaterialTheme.colors.onBackground,
+        disabledContentColor = Color.LightGray
+    )

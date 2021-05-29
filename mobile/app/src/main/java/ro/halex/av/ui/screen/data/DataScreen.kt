@@ -32,7 +32,7 @@ fun DataScreen(onBackPress: () -> Unit)
                     AnimatedVisibility(visible = datasets != null) {
                         DatasetSelection()
                     }
-                    RelationshipConfiguration()
+                    RelationshipConfiguration(onBackPress)
                 }
             }
         }

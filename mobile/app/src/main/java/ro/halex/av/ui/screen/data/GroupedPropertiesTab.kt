@@ -43,6 +43,13 @@ fun GroupedPropertiesTab()
                     onPropertySelect = { property ->
                         viewModel.addGroupedProperty(property, sortingOrder)
                     })
+
+                Button(
+                    onClick = { viewModel.fillGroupedProperties(sortingOrder) },
+                    colors = backgroundButtonColors()
+                ) {
+                    Text("Add all remaining properties")
+                }
             }
         }
 

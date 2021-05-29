@@ -17,7 +17,6 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     private val mutableDatasetsLoading = mutableStateOf(false)
     private val mutableDatasets = mutableStateOf<List<DatasetDTO>?>(null)
     private val mutableSelectedDataset = mutableStateOf<DatasetDTO?>(null)
-
     val mutableValuedProperties = mutableStateListOf<ValuedProperty>()
     val mutableClassificationProperties = mutableStateListOf<ClassificationProperty>()
     val mutableGroupedProperties = mutableStateListOf<GroupedProperty>()
@@ -25,6 +24,18 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     val datasetsLoading = mutableDatasetsLoading as State<Boolean>
     val datasets = mutableDatasets as State<List<DatasetDTO>?>
     val selectedDataset = mutableSelectedDataset as State<DatasetDTO?>
+
+    val nestingRelationshipEmpty: Boolean
+        get() = nestingRelationship.let {
+            it.valuedProperties.isEmpty() &&
+                    it.classificationProperties.isEmpty() &&
+                    it.groupedProperties.isEmpty()
+        }
+
+    val valuedPropertiesLeafNode: LeafNode
+        get() = LeafNode(listOf(mutableValuedProperties.associate { it.property to it.value }))
+
+    val helpTree: Node get() = helpNode(nestingRelationship)
 
     val nestingRelationship
         get() = NestingRelationship(
@@ -141,7 +152,7 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
             .toList()
     }
 
-    fun save(onSaveFinished: () -> Unit)
+    fun save(data: JsonElement, onSaveFinished: () -> Unit)
     {
         val dataset = requireNotNull(mutableSelectedDataset.value)
         val connectionURL = requireNotNull(mutableConnectionURL.value)
@@ -149,16 +160,24 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
         viewModelScope.launch {
             connectionDataStore.updateData { connectionURL }
             datasetInfoDataStore.updateData { dataset }
-            val currentNestingRelationship = nestingRelationship
-            datasetTreeDataStore.updateData {
-                httpClient.getDataset(
-                    connectionURL,
-                    dataset.name,
-                    currentNestingRelationship
-                ) ?: error("Response was not a json element")
-            }
-            nestingRelationshipDataStore.updateData { currentNestingRelationship }
+            datasetTreeDataStore.updateData { data }
+            nestingRelationshipDataStore.updateData { nestingRelationship }
             onSaveFinished()
+        }
+    }
+
+    suspend fun getData(): JsonElement?
+    {
+        val dataset = requireNotNull(mutableSelectedDataset.value)
+        val connectionURL = requireNotNull(mutableConnectionURL.value)
+        return httpClient.getDataset(
+            connectionURL,
+            dataset.name,
+            nestingRelationship
+        ) ?: run {
+            showToast("Server connection failed")
+            resetDatasets()
+            null
         }
     }
 
@@ -213,6 +232,13 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
 
     fun pushDown(groupedProperty: GroupedProperty) =
         mutableGroupedProperties.pushDown(groupedProperty)
+
+    fun fillGroupedProperties(sortingOrder: SortingOrder)
+    {
+        getAvailableProperties().forEach {
+            addGroupedProperty(it, sortingOrder)
+        }
+    }
 
     private fun <T : NestingElement> SnapshotStateList<T>.canPushUpDown(property: T): Pair<Boolean, Boolean>
     {

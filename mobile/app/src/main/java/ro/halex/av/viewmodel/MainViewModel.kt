@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 import ro.halex.av.backend.ClassificationProperty
+import ro.halex.av.backend.NestingRelationship
 import ro.halex.av.backend.getDataset
 import ro.halex.av.ui.screen.main.Module
 
@@ -58,25 +59,7 @@ class MainViewModel(application: Application) : AbstractViewModel(application)
 
     val helpTree: Flow<Node?> = nestingRelationship.map { relationship ->
         relationship ?: return@map null
-
-        fun convertRelationship(classificationProperties: List<ClassificationProperty>): Node
-        {
-            val classificationProperty = classificationProperties.firstOrNull() ?: run {
-                val dummyItem = relationship.groupedProperties.associate { it.property to "•" }
-                return LeafNode(listOf(dummyItem, dummyItem))
-            }
-
-            val subTree =
-                convertRelationship(classificationProperties.slice(1 until classificationProperties.size))
-
-            val property = classificationProperty.property
-            return InnerNode(
-                classificationProperty.module,
-                property,
-                mapOf("$property 1" to subTree, "$property 2" to subTree)
-            )
-        }
-        convertRelationship(relationship.classificationProperties)
+        helpNode(relationship)
     }
 
     val valuedProperties: Flow<LeafNode?> =

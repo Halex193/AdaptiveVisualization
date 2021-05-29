@@ -29,7 +29,7 @@ internal val icons = linkedMapOf(
 @Composable
 internal fun SortingOrderPicker(sortingOrder: SortingOrder, onSortingOrderChange: (SortingOrder) -> Unit)
 {
-    Row {
+    Row(Modifier.padding(5.dp)) {
         for ((sort, icon) in icons)
         {
             IconButton(modifier = Modifier.padding(5.dp).size(35.dp).clip(CircleShape), onClick = { if (sort != sortingOrder) onSortingOrderChange(sort) }) {
