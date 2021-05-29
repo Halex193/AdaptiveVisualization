@@ -205,14 +205,11 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
         mutableClassificationProperties.remove(classificationProperty)
     }
 
-    fun canPushUpDown(classificationProperty: ClassificationProperty): Pair<Boolean, Boolean> =
-        mutableClassificationProperties.canPushUpDown(classificationProperty)
-
-    fun pushUp(classificationProperty: ClassificationProperty) =
-        mutableClassificationProperties.pushUp(classificationProperty)
-
-    fun pushDown(classificationProperty: ClassificationProperty) =
-        mutableClassificationProperties.pushDown(classificationProperty)
+    fun swapClassificationProperties(index: Int)
+    {
+        val list = mutableClassificationProperties
+        list[index] = list[index + 1].also { list[index + 1] = list[index] }
+    }
 
     fun addGroupedProperty(property: String, sortingOrder: SortingOrder)
     {
@@ -224,41 +221,16 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
         mutableGroupedProperties.remove(groupedProperty)
     }
 
-    fun canPushUpDown(groupedProperty: GroupedProperty): Pair<Boolean, Boolean> =
-        mutableGroupedProperties.canPushUpDown(groupedProperty)
-
-    fun pushUp(groupedProperty: GroupedProperty) =
-        mutableGroupedProperties.pushUp(groupedProperty)
-
-    fun pushDown(groupedProperty: GroupedProperty) =
-        mutableGroupedProperties.pushDown(groupedProperty)
+    fun swapGroupedProperties(index: Int)
+    {
+        val list = mutableGroupedProperties
+        list[index] = list[index + 1].also { list[index + 1] = list[index] }
+    }
 
     fun fillGroupedProperties(sortingOrder: SortingOrder)
     {
         getAvailableProperties().forEach {
             addGroupedProperty(it, sortingOrder)
         }
-    }
-
-    private fun <T : NestingElement> SnapshotStateList<T>.canPushUpDown(property: T): Pair<Boolean, Boolean>
-    {
-        val index = this.indexOf(property)
-        val size = this.size
-
-        return (index >= 1) to (index < size - 1)
-    }
-
-    private fun <T : NestingElement> SnapshotStateList<T>.pushUp(property: T)
-    {
-        val index = this.indexOf(property)
-        this[index] = this[index - 1]
-        this[index - 1] = property
-    }
-
-    private fun <T : NestingElement> SnapshotStateList<T>.pushDown(property: T)
-    {
-        val index = this.indexOf(property)
-        this[index] = this[index + 1]
-        this[index + 1] = property
     }
 }

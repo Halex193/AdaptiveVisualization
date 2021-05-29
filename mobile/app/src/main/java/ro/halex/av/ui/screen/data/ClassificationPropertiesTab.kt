@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowRightAlt
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,67 +59,69 @@ fun ClassificationPropertiesTab()
             }
         }
 
-        items(classificationProperties) { classificationProperty ->
-            Surface(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(5.dp))
-                    .padding(10.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val (currentProperty, sort, module) = classificationProperty
-                    Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            currentProperty,
-                            Modifier
-                                .padding(10.dp)
-                                .weight(0.5f),
-                            textAlign = TextAlign.End,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Icon(Icons.Filled.ArrowRightAlt, "Assigned to")
-                        Text(
-                            module.label,
-                            Modifier
-                                .padding(10.dp)
-                                .weight(0.5f),
-                            textAlign = TextAlign.Start,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    val (canPushUp, canPushDown) = viewModel.canPushUpDown(classificationProperty)
-                    Column {
-                        IconButton(
-                            onClick = { viewModel.pushUp(classificationProperty) },
-                            enabled = canPushUp
-                        ) {
-                            Icon(Icons.Filled.ArrowUpward, "Push up")
-                        }
-                        IconButton(
-                            onClick = { viewModel.pushDown(classificationProperty) },
-                            enabled = canPushDown
-                        ) {
-                            Icon(Icons.Filled.ArrowDownward, "Push down")
-                        }
-                    }
-                    Column {
-                        IconButton(onClick = {}, enabled = false) {
-                            Icon(
-                                painterResource(checkNotNull(icons[sort])),
-                                "Sorting order",
-                                modifier = Modifier
-                                    .padding(5.dp)
-                                    .size(25.dp),
+        item {
+            Column(
+                Modifier.padding(vertical = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                classificationProperties.forEachIndexed { index, classificationProperty ->
+                    Surface(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp)
+                            .background(
+                                MaterialTheme.colors.surface,
+                                shape = RoundedCornerShape(5.dp)
                             )
-                        }
+                            .padding(10.dp)
+                    )
+                    {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val (currentProperty, sort, module) = classificationProperty
+                            Row(
+                                Modifier.weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    currentProperty,
+                                    Modifier
+                                        .padding(10.dp)
+                                        .weight(0.5f),
+                                    textAlign = TextAlign.End,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Icon(Icons.Filled.ArrowRightAlt, "Assigned to")
+                                Text(
+                                    module.label,
+                                    Modifier
+                                        .padding(10.dp)
+                                        .weight(0.5f),
+                                    textAlign = TextAlign.Start,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            IconButton(onClick = {}, enabled = false) {
+                                Icon(
+                                    painterResource(checkNotNull(icons[sort])),
+                                    "Sorting order",
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .size(25.dp),
+                                )
+                            }
 
-                        IconButton(onClick = {
-                            viewModel.deleteClassificationProperty(classificationProperty)
-                            onPropertyChange(null)
-                        }) {
-                            Icon(Icons.Filled.Delete, "Delete")
+                            IconButton(onClick = {
+                                viewModel.deleteClassificationProperty(classificationProperty)
+                                onPropertyChange(null)
+                            }) {
+                                Icon(Icons.Filled.Delete, "Delete")
+                            }
+                        }
+                    }
+                    if (index != classificationProperties.size - 1)
+                    {
+                        IconButton(onClick = { viewModel.swapClassificationProperties(index) }) {
+                            Icon(Icons.Filled.SwapVert, "Swap properties")
                         }
                     }
                 }

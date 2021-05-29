@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,65 +44,63 @@ fun GroupedPropertiesTab()
                     onPropertySelect = { property ->
                         viewModel.addGroupedProperty(property, sortingOrder)
                     })
-
-                Button(
-                    onClick = { viewModel.fillGroupedProperties(sortingOrder) },
-                    colors = backgroundButtonColors()
-                ) {
-                    Text("Add all remaining properties")
+                if (viewModel.getAvailableProperties().isNotEmpty())
+                {
+                    Button(
+                        onClick = { viewModel.fillGroupedProperties(sortingOrder) },
+                        colors = backgroundButtonColors()
+                    ) {
+                        Text("Add all remaining properties")
+                    }
                 }
             }
         }
 
-        items(groupedProperties) { groupedProperty ->
-            Surface(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .background(MaterialTheme.colors.surface, shape = RoundedCornerShape(5.dp))
-                    .padding(10.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val (currentProperty, sort) = groupedProperty
-                    Text(
-                        currentProperty,
+        item {
+            Column(Modifier.padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                groupedProperties.forEachIndexed { index, groupedProperty ->
+                    Surface(
                         Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 10.dp)
+                            .background(
+                                MaterialTheme.colors.surface,
+                                shape = RoundedCornerShape(5.dp)
+                            )
                             .padding(10.dp)
-                            .weight(1f),
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis
                     )
-                    val (canPushUp, canPushDown) = viewModel.canPushUpDown(groupedProperty)
-                    Column {
-                        IconButton(
-                            onClick = { viewModel.pushUp(groupedProperty) },
-                            enabled = canPushUp
-                        ) {
-                            Icon(Icons.Filled.ArrowUpward, "Push up")
-                        }
-                        IconButton(
-                            onClick = { viewModel.pushDown(groupedProperty) },
-                            enabled = canPushDown
-                        ) {
-                            Icon(Icons.Filled.ArrowDownward, "Push down")
+                    {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val (currentProperty, sort) = groupedProperty
+                            Text(
+                                currentProperty,
+                                Modifier
+                                    .padding(10.dp)
+                                    .weight(1f),
+                                textAlign = TextAlign.Center,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            IconButton(onClick = {}, enabled = false) {
+                                Icon(
+                                    painterResource(checkNotNull(icons[sort])),
+                                    "Sorting order",
+                                    modifier = Modifier
+                                        .padding(5.dp)
+                                        .size(25.dp),
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                viewModel.deleteGroupedProperty(groupedProperty)
+                            }) {
+                                Icon(Icons.Filled.Delete, "Delete")
+                            }
                         }
                     }
-                    Column {
-                        IconButton(onClick = {}, enabled = false) {
-                            Icon(
-                                painterResource(checkNotNull(icons[sort])),
-                                "Sorting order",
-                                modifier = Modifier
-                                    .padding(5.dp)
-                                    .size(25.dp),
-                            )
-                        }
-
-                        IconButton(onClick = {
-                            viewModel.deleteGroupedProperty(groupedProperty)
-                        }) {
-                            Icon(Icons.Filled.Delete, "Delete")
+                    if (index != groupedProperties.size -1)
+                    {
+                        IconButton(onClick = { viewModel.swapGroupedProperties(index) }) {
+                            Icon(Icons.Filled.SwapVert, "Swap properties")
                         }
                     }
                 }
