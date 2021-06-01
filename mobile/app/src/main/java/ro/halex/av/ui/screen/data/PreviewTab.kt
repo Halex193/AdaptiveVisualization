@@ -2,10 +2,9 @@ package ro.halex.av.ui.screen.data
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,38 +16,33 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.json.JsonElement
 import ro.halex.av.ui.screen.main.HelpCard
 import ro.halex.av.viewmodel.DataViewModel
-import ro.halex.av.viewmodel.LeafNode
 
 @Composable
 fun PreviewTab(onBackPress: () -> Unit)
 {
     val viewModel: DataViewModel = viewModel()
-    val nestingRelationship = viewModel.nestingRelationship
     if (!viewModel.nestingRelationshipEmpty)
     {
-        var data by remember(nestingRelationship) { mutableStateOf<JsonElement?>(null) }
-        LaunchedEffect(nestingRelationship)
-        {
-            data = viewModel.getData()
-        }
+        val dataDownloading = viewModel.dataDownloading
         LazyColumn(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             item {
-                Button(
-                    modifier = Modifier.padding(10.dp),
-                    onClick = {
-                        data?.let {
-                            viewModel.save(
-                                it,
-                                onSaveFinished = onBackPress
-                            )
+                Row {
+                    Button(
+                        modifier = Modifier.padding(10.dp),
+                        onClick = {
+                            if (!dataDownloading)
+                                viewModel.save(onSaveFinished = onBackPress)
+                        },
+                        colors = backgroundButtonColors(),
+                        enabled = !dataDownloading
+                    ) {
+                        Text(if (dataDownloading) "Downloading" else "Download data")
+                        if (dataDownloading)
+                        {
+                            Spacer(Modifier.width(5.dp))
+                            CircularProgressIndicator(Modifier.size(20.dp))
                         }
-                    },
-                    colors = backgroundButtonColors(),
-                    enabled = data != null
-                ) {
-                    Text(data?.let { "Save" } ?: "Data downloading")
-                    if (data == null)
-                        CircularProgressIndicator(Modifier.size(20.dp))
+                    }
                 }
 
                 val valuedProperties = viewModel.valuedPropertiesLeafNode

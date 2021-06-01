@@ -3,13 +3,14 @@ package ro.halex.av.viewmodel
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 import ro.halex.av.APP_TAG
 import ro.halex.av.backend.*
@@ -21,6 +22,7 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     private val mutableDatasetsLoading = mutableStateOf(false)
     private val mutableDatasets = mutableStateOf<List<DatasetDTO>?>(null)
     private val mutableSelectedDataset = mutableStateOf<DatasetDTO?>(null)
+    private val mutableDataDownloading = mutableStateOf(false)
     val mutableValuedProperties = mutableStateListOf<ValuedProperty>()
     val mutableClassificationProperties = mutableStateListOf<ClassificationProperty>()
     val mutableGroupedProperties = mutableStateListOf<GroupedProperty>()
@@ -28,6 +30,8 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     val datasetsLoading = mutableDatasetsLoading as State<Boolean>
     val datasets = mutableDatasets as State<List<DatasetDTO>?>
     val selectedDataset = mutableSelectedDataset as State<DatasetDTO?>
+    val dataDownloading by mutableDataDownloading
+    private var downloadDataJob: Job? = null
 
     val availableProperties: List<String>
         get()
@@ -163,32 +167,52 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
             .toList()
     }
 
-    suspend fun getData(): JsonElement?
+    private fun CoroutineScope.getDataAsync(): Deferred<JsonElement?>
     {
-        val dataset = requireNotNull(mutableSelectedDataset.value)
-        val connectionURL = requireNotNull(mutableConnectionURL.value)
-        return httpClient.getDataset(
-            connectionURL,
-            dataset.name,
-            nestingRelationship
-        ) ?: run {
-            showToast("Server connection failed")
-            resetDatasets()
-            null
+        return async {
+            val dataset = requireNotNull(mutableSelectedDataset.value)
+            val connectionURL = requireNotNull(mutableConnectionURL.value)
+            return@async httpClient.getDataset(
+                connectionURL,
+                dataset.name,
+                nestingRelationship
+            ) ?: run {
+                showToast("Server connection failed")
+                resetDatasets()
+                null
+            }
         }
     }
 
-    fun save(data: JsonElement, onSaveFinished: () -> Unit)
+    fun cancelDownloading(onCancelFinished: () -> Unit)
+    {
+        viewModelScope.launch {
+            downloadDataJob?.cancelAndJoin()
+            downloadDataJob = null
+            mutableDataDownloading.value = false
+            onCancelFinished()
+        }
+
+    }
+
+    fun save(onSaveFinished: () -> Unit)
     {
         val dataset = requireNotNull(mutableSelectedDataset.value)
         val connectionURL = requireNotNull(mutableConnectionURL.value)
 
+        mutableDataDownloading.value = true
         viewModelScope.launch {
+            val data = getDataAsync().also { downloadDataJob = it }.await() ?: run {
+                mutableDataDownloading.value = false
+                return@launch
+            }
+
             connectionDataStore.updateData { connectionURL }
             datasetInfoDataStore.updateData { dataset }
             datasetTreeDataStore.updateData { data }
             nestingRelationshipDataStore.updateData { nestingRelationship }
             onSaveFinished()
+            mutableDataDownloading.value = false
         }
     }
 

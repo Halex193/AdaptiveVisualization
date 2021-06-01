@@ -59,11 +59,12 @@ fun ConnectionRow()
                     Text("URL", color = MaterialTheme.colors.background)
                 }
                 Spacer(Modifier.width(5.dp))
-                Text("$connectionURL")
+                Text(connectionURL)
                 Spacer(Modifier.width(15.dp))
                 IconButton(
                     onClick = viewModel::resetDatasets,
-                    Modifier.size(20.dp)
+                    Modifier.size(20.dp),
+                    enabled = !viewModel.dataDownloading
                 ) {
                     Icon(Icons.Filled.Edit, "Edit URL")
                 }

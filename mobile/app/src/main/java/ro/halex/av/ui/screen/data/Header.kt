@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import ro.halex.av.viewmodel.DataViewModel
 
 @Composable
 fun Header(onBackPress: () -> Unit)
@@ -25,7 +27,8 @@ fun Header(onBackPress: () -> Unit)
     ) {
         IconButton(
             onClick = onBackPress,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.align(Alignment.CenterStart),
+            enabled = !viewModel<DataViewModel>().dataDownloading
         ) {
             Icon(Icons.Default.ArrowBack, "Back")
         }

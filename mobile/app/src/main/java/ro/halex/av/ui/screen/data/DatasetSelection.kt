@@ -44,7 +44,8 @@ fun DatasetSelection()
         {
             Button(
                 onClick = { expanded = true },
-                modifier = Modifier.padding(horizontal = 10.dp)
+                modifier = Modifier.padding(horizontal = 10.dp),
+                enabled = !viewModel.dataDownloading
             ) {
                 Text(
                     text = selectedDataset?.name ?: "Select dataset",

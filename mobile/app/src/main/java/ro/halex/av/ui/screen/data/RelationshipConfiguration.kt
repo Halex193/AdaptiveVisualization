@@ -17,18 +17,19 @@ import ro.halex.av.viewmodel.DataViewModel
 @Composable
 fun RelationshipConfiguration(onBackPress:() -> Unit)
 {
-    viewModel<DataViewModel>().selectedDataset.value ?: return
+    val viewModel = viewModel<DataViewModel>()
+    viewModel.selectedDataset.value ?: return
 
     var selectedTabIndex by remember { mutableStateOf(0) }
     ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
         Tab.values().forEachIndexed { index, tab ->
-            Tab(selected = selectedTabIndex == index, onClick = { selectedTabIndex = index }) {
+            Tab(selected = selectedTabIndex == index, onClick = { selectedTabIndex = index }, enabled = !viewModel.dataDownloading) {
                 Text(tab.label, Modifier.padding(10.dp))
             }
         }
     }
     Scaffold(Modifier.fillMaxSize(), backgroundColor = MaterialTheme.colors.primary) {
-        Crossfade(targetState = selectedTabIndex) {
+        selectedTabIndex.let {
             when (Tab.values()[it])
             {
                 Tab.VALUED -> ValuedPropertiesTab()
