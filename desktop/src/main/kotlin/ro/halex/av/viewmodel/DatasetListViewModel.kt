@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ro.halex.av.model.Dataset
 import ro.halex.av.model.datasetFlow
+import ro.halex.av.model.deleteDataset
+import ro.halex.av.model.updateDataset
 import ro.halex.av.view.Message
 import ro.halex.av.view.chooseFile
 
@@ -34,14 +36,14 @@ class DatasetListViewModel(private val mainViewModel: MainViewModel, val client:
         val deleteLoading = mutableStateOf(false)
         val updateLoading = mutableStateOf(false)
 
-        fun deleteDataset()
+        fun delete()
         {
             val currentConfiguration = mainViewModel.configuration.value ?: return
             var message by mainViewModel.message
             if (deleteLoading.value) return
             deleteLoading.value = true
             mainViewModel.coroutineScope.launch {
-                when (ro.halex.av.model.deleteDataset(client, currentConfiguration, dataset.name))
+                when (deleteDataset(client, currentConfiguration, dataset.name))
                 {
                     HttpStatusCode.OK -> message = Message("Dataset deleted", true)
                     HttpStatusCode.Unauthorized ->
@@ -56,7 +58,7 @@ class DatasetListViewModel(private val mainViewModel: MainViewModel, val client:
             }
         }
 
-        fun updateDataset()
+        fun update()
         {
             val currentConfiguration = mainViewModel.configuration.value ?: return
             var message by mainViewModel.message
@@ -64,8 +66,16 @@ class DatasetListViewModel(private val mainViewModel: MainViewModel, val client:
             updateLoading.value = true
             mainViewModel.coroutineScope.launch {
 
-                val file = chooseFile() ?: return@launch
-                when (ro.halex.av.model.updateDataset(client, currentConfiguration, dataset.name, file))
+                val file = chooseFile() ?: run {
+                    updateLoading.value = false
+                    return@launch
+                }
+                when (updateDataset(
+                    client,
+                    currentConfiguration,
+                    dataset.name,
+                    file
+                ))
                 {
                     HttpStatusCode.OK -> message = Message("Dataset updated", true)
 

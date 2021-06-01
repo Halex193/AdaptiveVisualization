@@ -23,6 +23,7 @@ import kotlinx.coroutines.delay
 import ro.halex.av.viewmodel.MainViewModel
 import java.io.File
 import javax.swing.JFileChooser
+import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -51,7 +52,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                 {
                     if (mutableMessage != null)
                     {
-                        delay(5.seconds)
+                        delay(5000)
                         mutableMessage = null
                     }
                 }

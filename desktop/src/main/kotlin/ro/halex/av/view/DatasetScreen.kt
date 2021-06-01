@@ -22,9 +22,9 @@ import ro.halex.av.viewmodel.DatasetListViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DatasetList(datsetListViewModel: DatasetListViewModel)
+fun DatasetList(datasetListViewModel: DatasetListViewModel)
 {
-    val mutableDatasets by datsetListViewModel.datasetListFlow().collectAsState(null)
+    val mutableDatasets by datasetListViewModel.datasetListFlow().collectAsState(null)
     Box(
         Modifier.width(600.dp).fillMaxHeight().padding(horizontal = 15.dp),
         contentAlignment = Alignment.TopCenter
@@ -41,7 +41,6 @@ fun DatasetList(datsetListViewModel: DatasetListViewModel)
             return@Box
         }
         val state = rememberLazyListState()
-        val itemCount = datasetViewModels.size
 
         LazyColumn(Modifier.fillMaxSize().padding(end = 15.dp), state) {
             items(datasetViewModels) {
@@ -50,11 +49,7 @@ fun DatasetList(datsetListViewModel: DatasetListViewModel)
         }
         VerticalScrollbar(
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(
-                scrollState = state,
-                itemCount = itemCount,
-                averageItemSize = 100.dp // TextBox height + Spacer height
-            ),
+            adapter = rememberScrollbarAdapter(scrollState = state),
             style = ScrollbarStyle(
                 0.dp,
                 6.dp,
@@ -92,7 +87,7 @@ fun Dataset(datasetViewModel: DatasetListViewModel.DatasetViewModel)
             if (datasetViewModel.createdByUser)
             {
                 val deleteLoading by datasetViewModel.deleteLoading
-                IconButton(onClick = datasetViewModel::deleteDataset, enabled = !deleteLoading)
+                IconButton(onClick = datasetViewModel::delete, enabled = !deleteLoading)
                 {
                     if (!deleteLoading)
                         Icon(Icons.Default.Delete, "Delete", tint = MaterialTheme.colors.background)
@@ -101,7 +96,7 @@ fun Dataset(datasetViewModel: DatasetListViewModel.DatasetViewModel)
                 }
 
                 val updateLoading by datasetViewModel.updateLoading
-                IconButton(onClick = datasetViewModel::updateDataset, enabled = !updateLoading)
+                IconButton(onClick = datasetViewModel::update, enabled = !updateLoading)
                 {
                     if (!updateLoading)
                         Icon(Icons.Default.Edit, "Update", tint = MaterialTheme.colors.background)
