@@ -22,7 +22,7 @@ import ro.halex.av.*
 class DatasetLocation
 {
     @Location("/{name}")
-    class Name(val name: String, val datasetLocation: DatasetLocation)
+    class Name(val name: String, @Suppress("unused") val datasetLocation: DatasetLocation)
 }
 
 fun Application.configureRouting(driver: Driver)

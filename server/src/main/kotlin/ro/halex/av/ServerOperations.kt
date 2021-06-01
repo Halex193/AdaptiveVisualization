@@ -17,6 +17,7 @@ import org.neo4j.driver.Driver
 import org.neo4j.driver.TransactionConfig
 import ro.halex.av.plugins.DatasetLocation
 import java.time.Duration
+import java.util.*
 
 suspend fun PipelineContext<Unit, ApplicationCall>.getDatasets(driver: Driver)
 {
@@ -78,14 +79,19 @@ suspend fun PipelineContext<Unit, ApplicationCall>.getClassifiedDataset(driver: 
         {
             return if (classificationProperties.isEmpty())
             {
+                val groupedProperties = relationship.groupedProperties.map { it.property }
                 val items = transaction.getContentsOfItemset(
                     currentId,
-                    projection = relationship.groupedProperties.map { it.property })
+                    projection = groupedProperties
+                )
                     .distinct()
                     .sortedWith(propertyComparator(relationship.groupedProperties.map { it.property to it.sort }))
-                JsonArray(items.map { JsonObject(it.mapValues { (_, value) -> JsonPrimitive(value) }) })
-            }
-            else
+                JsonArray(items.map { map ->
+                    map.mapValuesTo(TreeMap(compareBy { groupedProperties.indexOf(it) })) { (_, value) ->
+                        JsonPrimitive(value)
+                    }.let { treeMap -> JsonObject(treeMap)}
+                })
+            } else
             {
                 val (property, sort) = classificationProperties.first()
                 val values = transaction.getValuesAndItemsets(currentId, property).ifEmpty {
@@ -102,8 +108,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.getClassifiedDataset(driver: 
 
         val json = createTree(firstNonValuedItemsetId, relationship.classificationProperties)
         call.respond(HttpStatusCode.OK, json)
-    }
-    finally
+    } finally
     {
         transaction.commit()
     }

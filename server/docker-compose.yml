@@ -7,7 +7,9 @@ services:
     depends_on:
       - database
     environment:
-      DATABASE: "database"
+      DATABASE_HOST: "database"
+      DATABASE_USERNAME: "neo4j"
+      DATABASE_PASSWORD: "password"
   database:
     image: "neo4j:4.2.1"
     ports:
