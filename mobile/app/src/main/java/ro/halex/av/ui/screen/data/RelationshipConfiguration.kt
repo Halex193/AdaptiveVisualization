@@ -20,10 +20,10 @@ fun RelationshipConfiguration(onBackPress:() -> Unit)
     viewModel<DataViewModel>().selectedDataset.value ?: return
 
     var selectedTabIndex by remember { mutableStateOf(0) }
-    TabRow(selectedTabIndex = selectedTabIndex) {
+    ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
         Tab.values().forEachIndexed { index, tab ->
             Tab(selected = selectedTabIndex == index, onClick = { selectedTabIndex = index }) {
-                Text(tab.label, Modifier.padding(vertical = 10.dp))
+                Text(tab.label, Modifier.padding(10.dp))
             }
         }
     }

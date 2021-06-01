@@ -1,10 +1,9 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
     kotlin("plugin.serialization") version "1.4.32"
-}
-apply {
-    plugin("kotlin-android")
 }
 
 android {
@@ -73,4 +72,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     implementation("io.ktor:ktor-client-serialization:1.5.4")
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha01")
+
+    implementation(platform("com.google.firebase:firebase-bom:28.0.1"))
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
 }

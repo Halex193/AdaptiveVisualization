@@ -20,7 +20,6 @@ fun ConnectionRow()
 {
     val viewModel: DataViewModel = viewModel()
     val (connectionURL, onConnectionURLChange) = viewModel.mutableConnectionURL
-    connectionURL ?: return
     val datasets = viewModel.datasets.value
     Crossfade(targetState = datasets) {
         Row(

@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonElement
 
-const val defaultConnectionURL = "http://192.168.0.193:8080"
+const val defaultConnectionURL = "http://halex193.go.ro"
 
 fun createHttpClient(): HttpClient = HttpClient(CIO) {
     // expectSuccess = false

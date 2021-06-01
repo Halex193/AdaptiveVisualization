@@ -32,7 +32,7 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
     val availableProperties: List<String>
         get()
         {
-            val dataset = requireNotNull(mutableSelectedDataset.value)
+            val dataset = mutableSelectedDataset.value ?: return emptyList()
             val existingProperties = setOf<List<NestingElement>>(
                 mutableValuedProperties,
                 mutableClassificationProperties,
@@ -102,9 +102,9 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
 
     fun resetDatasets()
     {
-        resetNestingRelationShip()
         mutableDatasets.value = null
         mutableSelectedDataset.value = null
+        resetNestingRelationShip()
     }
 
     private fun resetNestingRelationShip()
