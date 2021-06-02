@@ -206,11 +206,13 @@ class DataViewModel(application: Application) : AbstractViewModel(application)
                 mutableDataDownloading.value = false
                 return@launch
             }
-
-            connectionDataStore.updateData { connectionURL }
-            datasetInfoDataStore.updateData { dataset }
-            datasetTreeDataStore.updateData { data }
-            nestingRelationshipDataStore.updateData { nestingRelationship }
+            withContext(NonCancellable)
+            {
+                connectionDataStore.updateData { connectionURL }
+                datasetInfoDataStore.updateData { dataset }
+                datasetTreeDataStore.updateData { data }
+                nestingRelationshipDataStore.updateData { nestingRelationship }
+            }
             onSaveFinished()
             mutableDataDownloading.value = false
         }

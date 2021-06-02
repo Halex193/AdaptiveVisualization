@@ -20,15 +20,15 @@ import ro.halex.av.viewmodel.DataViewModel
 @Composable
 fun Header(onBackPress: () -> Unit)
 {
+    val viewModel = viewModel<DataViewModel>()
     Box(
         Modifier
             .fillMaxWidth()
             .padding(10.dp)
     ) {
         IconButton(
-            onClick = onBackPress,
-            modifier = Modifier.align(Alignment.CenterStart),
-            enabled = !viewModel<DataViewModel>().dataDownloading
+            onClick = { viewModel.cancelDownloading(onBackPress) },
+            modifier = Modifier.align(Alignment.CenterStart)
         ) {
             Icon(Icons.Default.ArrowBack, "Back")
         }
