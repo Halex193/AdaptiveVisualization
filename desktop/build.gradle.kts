@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "ro.halex.av"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -20,7 +20,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.compose.material:material-icons-extended-desktop:0.4.0")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
@@ -28,10 +27,10 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("io.ktor:ktor-client-websockets:$ktor_version")
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:0.15.2")
+    implementation(compose.desktop.currentOs)
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.6.0")
-    implementation(compose.desktop.currentOs)
     testImplementation("it.skrape:skrapeit-core:1.0.0-alpha8")
 }
 
@@ -48,7 +47,7 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "desktop"
+            packageName = "Adaptive Visualization"
         }
     }
 }

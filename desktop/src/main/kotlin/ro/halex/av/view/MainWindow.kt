@@ -9,8 +9,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.svgResource
+import androidx.compose.ui.res.vectorXmlResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import ro.halex.av.viewmodel.MainViewModel
@@ -87,7 +86,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                                 mutableMessage = Message("Logged out", true)
                             })
                             {
-                                Icon(Icons.Filled.Logout, "Logout")
+                                Icon(vectorXmlResource("icons/logout.xml"), "Logout")
                             }
                         }
                 }
@@ -110,7 +109,7 @@ fun MainWindow(mainViewModel: MainViewModel)
                                 if (message.success)
                                     Icon(Icons.Filled.Check, "Success")
                                 else
-                                    Icon(Icons.Filled.Error, "Error")
+                                    Icon(vectorXmlResource("icons/error.xml"), "Error")
                                 Spacer(Modifier.width(10.dp))
                                 Text(message.text)
                                 Spacer(Modifier.width(10.dp))
