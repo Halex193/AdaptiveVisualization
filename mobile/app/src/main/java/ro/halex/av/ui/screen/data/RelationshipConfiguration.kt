@@ -29,7 +29,7 @@ fun RelationshipConfiguration(onBackPress:() -> Unit)
         }
     }
     Scaffold(Modifier.fillMaxSize(), backgroundColor = MaterialTheme.colors.primary) {
-        selectedTabIndex.let {
+        Crossfade(targetState = selectedTabIndex) {
             when (Tab.values()[it])
             {
                 Tab.VALUED -> ValuedPropertiesTab()

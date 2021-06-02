@@ -14,11 +14,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import ro.halex.av.R
 import ro.halex.av.backend.SortingOrder
 import ro.halex.av.viewmodel.DataViewModel
 
@@ -29,7 +31,7 @@ fun ValuedPropertiesTab()
     val viewModel: DataViewModel = viewModel()
     val valuedProperties = viewModel.mutableValuedProperties
     val coroutineScope = rememberCoroutineScope()
-    val (property, onPropertyChange) = remember { mutableStateOf<String?>(null) }
+    val (property, onPropertyChange) = remember(viewModel.selectedDataset.value) { mutableStateOf<String?>(null) }
     val (sortingOrder, onSortingOrderChange) = remember { mutableStateOf(SortingOrder.ASCENDING) }
     var values by remember { mutableStateOf<List<String>?>(null) }
 
@@ -99,7 +101,7 @@ fun ValuedPropertiesTab()
                             textAlign = TextAlign.End,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Icon(Icons.Filled.ArrowRightAlt, "Assigned to")
+                        Icon(painterResource(R.drawable.arrow_right_alt_24), "Assigned to")
                         Text(
                             value,
                             Modifier

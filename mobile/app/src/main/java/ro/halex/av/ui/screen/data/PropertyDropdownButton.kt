@@ -1,5 +1,6 @@
 package ro.halex.av.ui.screen.data
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -20,7 +21,7 @@ internal fun PropertyDropdownButton(
     var expanded by remember { mutableStateOf(false) }
     val properties  = viewModel.availableProperties
     Box(modifier) {
-        Button(
+        CustomButton(
             onClick = {
                 expanded = true
             },

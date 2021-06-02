@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ro.halex.av.R
 import ro.halex.av.backend.SortingOrder
 import ro.halex.av.viewmodel.DataViewModel
 
@@ -24,7 +25,7 @@ fun ClassificationPropertiesTab()
 {
     val viewModel: DataViewModel = viewModel()
     val classificationProperties = viewModel.mutableClassificationProperties
-    val (property, onPropertyChange) = remember { mutableStateOf<String?>(null) }
+    val (property, onPropertyChange) = remember(viewModel.selectedDataset.value) { mutableStateOf<String?>(null) }
     val (sortingOrder, onSortingOrderChange) = remember { mutableStateOf(SortingOrder.ASCENDING) }
 
     LazyColumn(Modifier.fillMaxSize())
@@ -90,7 +91,7 @@ fun ClassificationPropertiesTab()
                                     textAlign = TextAlign.End,
                                     overflow = TextOverflow.Ellipsis
                                 )
-                                Icon(Icons.Filled.ArrowRightAlt, "Assigned to")
+                                Icon(painterResource(R.drawable.arrow_right_alt_24), "Assigned to")
                                 Text(
                                     module.label,
                                     Modifier
@@ -121,7 +122,7 @@ fun ClassificationPropertiesTab()
                     if (index != classificationProperties.size - 1)
                     {
                         IconButton(onClick = { viewModel.swapClassificationProperties(index) }) {
-                            Icon(Icons.Filled.SwapVert, "Swap properties")
+                            Icon(painterResource(R.drawable.swap_vert_24), "Swap properties")
                         }
                     }
                 }

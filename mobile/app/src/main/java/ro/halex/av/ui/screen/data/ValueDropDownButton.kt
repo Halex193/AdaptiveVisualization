@@ -1,5 +1,6 @@
 package ro.halex.av.ui.screen.data
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -17,7 +18,7 @@ internal fun ValueDropDownButton(
 )
 {
     Box(modifier) {
-        Button(
+        CustomButton(
             onClick = {
                 if (values != null)
                 {
@@ -25,8 +26,8 @@ internal fun ValueDropDownButton(
                 }
             },
             colors = backgroundButtonColors(),
-            enabled = values != null
-        ) {
+            enabled = values != null)
+        {
             Text("Choose value")
         }
         DropdownMenu(expanded = expanded, onDismissRequest = { onExpandChange(false) }) {

@@ -1,12 +1,12 @@
 package ro.halex.av.ui.screen.data
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Button
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ro.halex.av.ui.screen.main.Module
 
@@ -20,7 +20,7 @@ internal fun ModuleDropDownButton(
 )
 {
     Box(modifier) {
-        Button(
+        CustomButton(
             onClick = { onExpandChange(true) },
             colors = backgroundButtonColors(),
             enabled = enabled

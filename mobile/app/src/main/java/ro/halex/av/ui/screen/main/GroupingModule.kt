@@ -36,6 +36,10 @@ fun GroupingModule(node: LeafNode)
                             Text(value)
                         }
                     }
+                    if (item.isEmpty())
+                    {
+                        Text(text = "No grouping properties selected")
+                    }
                 }
             }
         }

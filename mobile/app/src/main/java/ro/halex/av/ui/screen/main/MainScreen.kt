@@ -11,9 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ro.halex.av.R
 import ro.halex.av.ui.screen.main.*
 import ro.halex.av.ui.theme.AdaptiveVisualizationTheme
 import ro.halex.av.viewmodel.MainViewModel
@@ -27,7 +29,7 @@ fun MainScreen(onDataPress: () -> Unit)
         val datasetInfo = viewModel.datasetInfo.collectAsState(initial = null).value
         val color = datasetInfo
             ?.let { Color(it.color.toLong(16)) }
-            ?: Color.Black
+            ?: Color.DarkGray
         AdaptiveVisualizationTheme(themeColor = color) {
             Surface(Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                 LazyColumn(
@@ -65,10 +67,10 @@ fun MainScreen(onDataPress: () -> Unit)
                                 Crossfade(showHelp) {
                                     if (it)
                                     {
-                                        Icon(Icons.Filled.Help, "Show Help")
+                                        Icon(painterResource(R.drawable.help_24), "Show Help")
                                     } else
                                     {
-                                        Icon(Icons.Filled.HelpOutline, "Hide Help")
+                                        Icon(painterResource(R.drawable.help_outline_24), "Hide Help")
                                     }
                                 }
                             }
@@ -87,10 +89,12 @@ fun MainScreen(onDataPress: () -> Unit)
                                 }
                             } else
                             {
-                                viewModel.tree.collectAsState(initial = null).value?.let { tree ->
-                                    DynamicUserInterface(tree)
-                                }
-                                    ?: run {
+                                Crossfade(viewModel.tree.collectAsState(initial = null).value) { tree ->
+                                    if (tree != null)
+                                    {
+                                        DynamicUserInterface(tree)
+                                    } else
+                                    {
                                         Box(Modifier.fillMaxSize())
                                         {
                                             val nestingRelationshipEmpty =
@@ -105,12 +109,11 @@ fun MainScreen(onDataPress: () -> Unit)
                                                         .padding(20.dp)
                                                         .fillMaxSize(), textAlign = TextAlign.Center
                                                 )
-                                            } else
-                                            {
-                                                CircularProgressIndicator()
                                             }
                                         }
                                     }
+                                }
+
                             }
                         }
                     }

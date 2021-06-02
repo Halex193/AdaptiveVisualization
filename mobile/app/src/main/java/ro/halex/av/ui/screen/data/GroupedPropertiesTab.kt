@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import ro.halex.av.R
 import ro.halex.av.backend.SortingOrder
 import ro.halex.av.viewmodel.DataViewModel
 
@@ -46,7 +44,7 @@ fun GroupedPropertiesTab()
                     })
                 if (viewModel.availableProperties.isNotEmpty())
                 {
-                    Button(
+                    CustomButton(
                         onClick = { viewModel.fillGroupedProperties(sortingOrder) },
                         colors = backgroundButtonColors()
                     ) {
@@ -100,7 +98,7 @@ fun GroupedPropertiesTab()
                     if (index != groupedProperties.size -1)
                     {
                         IconButton(onClick = { viewModel.swapGroupedProperties(index) }) {
-                            Icon(Icons.Filled.SwapVert, "Swap properties")
+                            Icon(painterResource(R.drawable.swap_vert_24), "Swap properties")
                         }
                     }
                 }
