@@ -41,6 +41,7 @@ class AddViewModel(private val mainViewModel: MainViewModel, val client: HttpCli
         if (adding.value) return
         adding.value = true
 
+        @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
         var message by mainViewModel.message
         mainViewModel.coroutineScope.launch {
             val currentFile = file.value

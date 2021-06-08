@@ -20,7 +20,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ro.halex.av.viewmodel.DatasetListViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DatasetList(datasetListViewModel: DatasetListViewModel)
 {

@@ -18,7 +18,6 @@ import ro.halex.av.model.FileDetails
 import ro.halex.av.model.datasetColors
 import ro.halex.av.viewmodel.AddViewModel
 
-@OptIn(ExperimentalUnsignedTypes::class)
 @Composable
 fun AddDataset(addViewModel: AddViewModel)
 {

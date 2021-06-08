@@ -1,3 +1,5 @@
+package ro.halex.av
+
 import androidx.compose.desktop.Window
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
@@ -5,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import ro.halex.av.view.MainWindow
 import ro.halex.av.viewmodel.MainViewModel
 import java.awt.image.BufferedImage
-import java.io.File
+import java.io.InputStream
 import java.security.Security
 import javax.imageio.ImageIO
 
@@ -21,9 +23,9 @@ fun main()
     }
 }
 
-fun getResource(path: String): File?
+fun getResource(path: String): InputStream?
 {
-    return Thread.currentThread().contextClassLoader.getResource(path)?.toURI()?.let { File(it) }
+    return Thread.currentThread().contextClassLoader.getResourceAsStream(path)
 }
 
 fun getWindowIcon(): BufferedImage

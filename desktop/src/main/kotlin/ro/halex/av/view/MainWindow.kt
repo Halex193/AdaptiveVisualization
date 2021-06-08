@@ -22,13 +22,9 @@ import kotlinx.coroutines.delay
 import ro.halex.av.viewmodel.MainViewModel
 import java.io.File
 import javax.swing.JFileChooser
-import kotlin.time.Duration
-import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 data class Message(val text: String, val success: Boolean)
 
-@OptIn(ExperimentalTime::class)
 @Composable
 fun MainWindow(mainViewModel: MainViewModel)
 {
@@ -140,7 +136,7 @@ fun MainWindow(mainViewModel: MainViewModel)
 fun chooseFile(): File?
 {
     val fileChooser =
-        JFileChooser(File("I:\\Preparation of Bachelors Thesis\\Bachelor Project\\Adaptive-Visualizer\\desktop\\data"))
+        JFileChooser(File("data"))
     return when (fileChooser.showOpenDialog(null))
     {
         JFileChooser.APPROVE_OPTION -> fileChooser.selectedFile

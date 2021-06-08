@@ -4,29 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="906fa6d0-84bf-4f79-8462-df8e8a6f34f0" name="Default Changelist" comment="Migrate to new Compose version">
-      <change afterPath="$PROJECT_DIR$/src/test/kotlin/scraping/StructureScraper.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/kotlin/scraping/TimetableScraper.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/CustomButton.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="906fa6d0-84bf-4f79-8462-df8e8a6f34f0" name="Default Changelist" comment="Final version">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/Defaults.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/Defaults.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/MainWindow.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/MainWindow.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/kotlin/Test.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/kotlin/Test.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../mobile/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ClassificationPropertiesTab.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ClassificationPropertiesTab.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/GroupedPropertiesTab.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/GroupedPropertiesTab.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ModuleDropDownButton.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ModuleDropDownButton.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/PropertyDropdownButton.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/PropertyDropdownButton.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/RelationshipConfiguration.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/RelationshipConfiguration.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ValueDropDownButton.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ValueDropDownButton.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ValuedPropertiesTab.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/data/ValuedPropertiesTab.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/main/GroupingModule.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/main/GroupingModule.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/main/MainScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/java/ro/halex/av/ui/screen/main/MainScreen.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/res/values-night/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/res/values-night/themes.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/res/values/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../mobile/app/src/main/res/values/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/app/src/main/res/values/themes.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../mobile/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../mobile/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +47,12 @@
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="desktop" type="f1a62948:ProjectNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="build setup" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="desktop" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="compose desktop" type="c8890929:TasksNode$1" />
               </path>
               <path>
@@ -73,6 +60,18 @@
                 <item name="desktop" type="f1a62948:ProjectNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="help" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="desktop" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="other" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="desktop" type="f1a62948:ProjectNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="verification" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
@@ -104,6 +103,11 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/main/kotlin/ro/halex/av/Main.kt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/kotlin/ro/halex/av/model/DatasetColors.kt" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/kotlin/ro/halex/av/view/MainWindow.kt" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="KotlinMultiplatform">
     <allAvailableExecutables />
@@ -139,7 +143,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="editing.templates" />
+    <property name="settings.editor.selected.configurable" value="terminal" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -156,7 +160,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.desktop [packageMsi]">
+  <component name="RunManager" selected="Kotlin.MainKt">
     <configuration default="true" type="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method v="2">
@@ -165,17 +169,6 @@
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -243,6 +236,27 @@
       <DebugAllEnabled>false</DebugAllEnabled>
       <method v="2" />
     </configuration>
+    <configuration name="desktop [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="run" />
+          </list>
+        </option>
+        <option name="vmOptions" value="" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
@@ -251,7 +265,7 @@
       </method>
     </configuration>
     <configuration name="MainKt" type="JetRunConfigurationType" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="MainKt" />
+      <option name="MAIN_CLASS_NAME" value="ro.halex.av.MainKt" />
       <module name="desktop.main" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -282,11 +296,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Gradle.desktop [clean]" />
+      <item itemvalue="Gradle.desktop [outgoingVariants]" />
+      <item itemvalue="Gradle.desktop [packageMsi]" />
+      <item itemvalue="Kotlin.TestKt" />
+      <item itemvalue="Kotlin.MainKt" />
+      <item itemvalue="Gradle.desktop [run]" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.desktop [run]" />
+        <item itemvalue="Kotlin.TestKt" />
         <item itemvalue="Gradle.desktop [packageMsi]" />
         <item itemvalue="Gradle.desktop [outgoingVariants]" />
-        <item itemvalue="Kotlin.TestKt" />
         <item itemvalue="Gradle.desktop [clean]" />
       </list>
     </recent_temporary>
@@ -408,7 +431,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622571484968</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Final version">
+      <created>1623140906332</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1623140906332</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -435,6 +465,11 @@
     <MESSAGE value="Refactor code to separate MVVM components" />
     <MESSAGE value="Polish interface, fix consistency" />
     <MESSAGE value="Migrate to new Compose version" />
-    <option name="LAST_COMMIT_MESSAGE" value="Migrate to new Compose version" />
+    <MESSAGE value="Final version - desktop" />
+    <option name="LAST_COMMIT_MESSAGE" value="Final version - desktop" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
