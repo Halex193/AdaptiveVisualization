@@ -39,6 +39,7 @@ class DatasetListViewModel(private val mainViewModel: MainViewModel, val client:
         fun delete()
         {
             val currentConfiguration = mainViewModel.configuration.value ?: return
+            @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
             var message by mainViewModel.message
             if (deleteLoading.value) return
             deleteLoading.value = true
@@ -61,6 +62,7 @@ class DatasetListViewModel(private val mainViewModel: MainViewModel, val client:
         fun update()
         {
             val currentConfiguration = mainViewModel.configuration.value ?: return
+            @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
             var message by mainViewModel.message
             if (updateLoading.value) return
             updateLoading.value = true
